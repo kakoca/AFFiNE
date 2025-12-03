@@ -46,8 +46,8 @@ export class ReleaseVersionType {
   @Field(() => GraphQLISODateTime)
   publishedAt!: Date;
 
-  @Field()
-  changelog!: string;
+  @Field({ nullable: true })
+  changelog?: string;
 }
 
 const RELEASE_CHANNEL_MAP = new Map<Namespace, string>([
@@ -152,7 +152,7 @@ export class ServerConfigResolver {
       return {
         version: latest.name,
         url: latest.url,
-        changelog: latest.body,
+        changelog: latest.body || '',
         publishedAt: new Date(latest.published_at),
       };
     } catch (e) {

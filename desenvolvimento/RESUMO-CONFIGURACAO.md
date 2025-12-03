@@ -189,7 +189,9 @@ Acesse: http://localhost:4001
 ### Modificados:
 - ✅ `.docker/dev/compose.yml` - Adicionado serviço LiteLLM
 - ✅ `.docker/dev/.env` - Variáveis AWS e LiteLLM
+- ✅ `.docker/dev/litellm_config.yaml` - Adicionados Claude 4.5 Sonnet e Haiku
 - ✅ `packages/backend/server/.env` - Selfhosted + LiteLLM
+- ✅ `packages/frontend/core/src/components/top-tip.tsx` - Banner removido em self-hosted
 
 ### Criados:
 - ✅ `.docker/dev/litellm_config.yaml` - Configuração dos modelos
@@ -197,6 +199,7 @@ Acesse: http://localhost:4001
 - ✅ `desenvolvimento/WORKSPACE-AI-CONTROL-EXAMPLE.md` - Exemplo de controle
 - ✅ `desenvolvimento/AWS-BEDROCK-CLAUDE-GUIDE.md` - Guia Bedrock
 - ✅ `desenvolvimento/SELF-HOSTED-PREMIUM-GUIDE.md` - Guia premium
+- ✅ `desenvolvimento/COMO-USAR-IA-SELFHOSTED.md` - Como usar IA (IMPORTANTE!)
 - ✅ `desenvolvimento/RESUMO-CONFIGURACAO.md` - Este arquivo
 
 ## 🔒 Segurança - Checklist

@@ -1658,7 +1658,7 @@ type QueryTooLongDataType {
 }
 
 type ReleaseVersionType {
-  changelog: String!
+  changelog: String
   publishedAt: DateTime!
   url: String!
   version: String!

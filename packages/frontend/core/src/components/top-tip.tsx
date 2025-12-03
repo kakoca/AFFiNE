@@ -73,8 +73,10 @@ export const TopTip = ({
     globalDialogService.open('sign-in', {});
   }, [globalDialogService]);
 
+  // Don't show LocalDemoTips in self-hosted deployments
   if (
     !BUILD_CONFIG.isElectron &&
+    !environment.isSelfHosted &&
     showLocalDemoTips &&
     workspace.flavour === 'local'
   ) {
