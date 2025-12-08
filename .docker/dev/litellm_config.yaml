@@ -74,7 +74,49 @@ model_list:
   # ============================================
   # AWS Bedrock - Titan Embeddings
   # ============================================
+  # Titan Embed Text v2 (Latest - 1024 dimensions)
+  # Best for: Text-only embeddings with 1024 dimensions (AFFiNE default)
+  # Supports: Up to 8192 input tokens
+  # IMPORTANTE: Usando nome "text-embedding-ada-002" para compatibilidade com AFFiNE
+  - model_name: text-embedding-ada-002
+    litellm_params:
+      model: bedrock/amazon.titan-embed-text-v2:0
+      aws_region_name: os.environ/AWS_REGION_NAME
+      aws_access_key_id: os.environ/AWS_ACCESS_KEY_ID
+      aws_secret_access_key: os.environ/AWS_SECRET_ACCESS_KEY
+    model_info:
+      mode: embedding
+      input_cost_per_token: 0.0000001  # $0.0001 per 1K tokens
+      output_dimensions: 1024
+  
+  # Alias alternativo (mantém titan-embed-text também)
   - model_name: titan-embed-text
+    litellm_params:
+      model: bedrock/amazon.titan-embed-text-v2:0
+      aws_region_name: os.environ/AWS_REGION_NAME
+      aws_access_key_id: os.environ/AWS_ACCESS_KEY_ID
+      aws_secret_access_key: os.environ/AWS_SECRET_ACCESS_KEY
+    model_info:
+      mode: embedding
+      input_cost_per_token: 0.0000001  # $0.0001 per 1K tokens
+      output_dimensions: 1024
+  
+  # Gemini embedding model alias (AFFiNE default when no override)
+  # Maps to Titan for AWS Bedrock compatibility
+  - model_name: gemini-embedding-001
+    litellm_params:
+      model: bedrock/amazon.titan-embed-text-v2:0
+      aws_region_name: os.environ/AWS_REGION_NAME
+      aws_access_key_id: os.environ/AWS_ACCESS_KEY_ID
+      aws_secret_access_key: os.environ/AWS_SECRET_ACCESS_KEY
+    model_info:
+      mode: embedding
+      input_cost_per_token: 0.0000001  # $0.0001 per 1K tokens
+      output_dimensions: 1024
+
+  # Titan Embed Text v1 (Fallback)
+  # Use if v2 has issues
+  - model_name: titan-embed-text-v1
     litellm_params:
       model: bedrock/amazon.titan-embed-text-v1
       aws_region_name: os.environ/AWS_REGION_NAME
@@ -82,6 +124,30 @@ model_list:
       aws_secret_access_key: os.environ/AWS_SECRET_ACCESS_KEY
     model_info:
       mode: embedding
+      output_dimensions: 1024
+
+  # ============================================
+  # Other AWS Bedrock Embedding Models (NOT COMPATIBLE)
+  # ============================================
+  # These models are NOT compatible with AFFiNE because:
+  # - AFFiNE requires exactly 1024 dimensions
+  # - AFFiNE only supports text embeddings (not multimodal)
+  #
+  # Amazon Nova Multimodal Embeddings v1
+  # - Dimensions: 1024 (compatible!) BUT multimodal (text + images)
+  # - AFFiNE doesn't support multimodal embeddings yet
+  # - model: bedrock/amazon.nova-2-multimodal-embeddings-v1:0
+  #
+  # Titan Embed Image v1
+  # - Dimensions: 1024 (compatible!) BUT image-only
+  # - AFFiNE needs text embeddings, not image
+  # - model: bedrock/amazon.titan-embed-image-v1
+  #
+  # Cohere Embed English/Multilingual
+  # - Dimensions: 1024 (compatible!)
+  # - Could work but Titan is AWS native and cheaper
+  # - model: bedrock/cohere.embed-english-v3
+  # - model: bedrock/cohere.embed-multilingual-v3
 
   # ============================================
   # OpenAI Models (if you want to use OpenAI too)
@@ -111,10 +177,13 @@ router_settings:
   num_retries: 3
   timeout: 600  # 10 minutes
   fallbacks:
+    # Chat models fallbacks
     - claude-4-5-sonnet: [claude-3-5-sonnet, claude-3-sonnet]
     - claude-4-5-haiku: [claude-3-haiku]
     - claude-3-5-sonnet: [claude-3-sonnet, claude-3-haiku]
     - claude-3-opus: [claude-3-5-sonnet, claude-3-sonnet]
+    # Embedding models fallbacks
+    - titan-embed-text: [titan-embed-text-v1]
 
 # ============================================
 # General Settings
@@ -141,6 +210,12 @@ litellm_settings:
   
   # Set default max tokens
   max_tokens: 4096
+  
+  # Enable streaming
+  stream: true
+  
+  # Return full response (important for compatibility)
+  return_response_headers: true
   
   # Enable caching (optional - requires Redis)
   # cache: true

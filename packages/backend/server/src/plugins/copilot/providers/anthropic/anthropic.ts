@@ -29,6 +29,9 @@ export abstract class AnthropicProvider<T> extends CopilotProvider<T> {
   protected abstract instance:
     | AnthropicSDKProvider
     | GoogleVertexAnthropicProvider;
+  
+  protected abstract getBaseURL(): string;
+  protected abstract getApiKey(): string;
 
   private handleError(e: any) {
     if (e instanceof UserFriendlyError) {
@@ -185,5 +188,57 @@ export abstract class AnthropicProvider<T> extends CopilotProvider<T> {
   private isReasoningModel(model: string) {
     // claude 3.5 sonnet doesn't support reasoning config
     return model.includes('sonnet') && !model.startsWith('claude-3-5-sonnet');
+  }
+
+  // Embedding support via LiteLLM HTTP API
+  // Anthropic SDK doesn't support embeddings, so we call LiteLLM directly
+  override async embedding(
+    cond: ModelConditions,
+    messages: string | string[],
+    options: { dimensions?: number } = {}
+  ): Promise<number[][]> {
+    messages = Array.isArray(messages) ? messages : [messages];
+    const fullCond = { ...cond, outputType: ModelOutputType.Embedding };
+    await this.checkParams({ embeddings: messages, cond: fullCond, options });
+    const model = this.selectModel(fullCond);
+
+    try {
+      metrics.ai
+        .counter('generate_embedding_calls')
+        .add(1, { model: model.id });
+
+      const baseURL = this.getBaseURL();
+      const apiKey = this.getApiKey();
+
+      this.logger.debug(
+        `Calling LiteLLM embeddings API: ${baseURL}/embeddings with model ${model.id}`
+      );
+
+      const response = await fetch(`${baseURL}/embeddings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: model.id,
+          input: messages,
+          dimensions: options.dimensions,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(`LiteLLM API error: ${error}`);
+      }
+
+      const data = await response.json();
+      return data.data.map((item: any) => item.embedding);
+    } catch (e: any) {
+      metrics.ai
+        .counter('generate_embedding_errors')
+        .add(1, { model: model.id });
+      throw this.handleError(e);
+    }
   }
 }

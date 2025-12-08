@@ -50,9 +50,29 @@ export class AnthropicOfficialProvider extends AnthropicProvider<AnthropicOffici
         },
       ],
     },
+    // Embedding model via LiteLLM
+    {
+      name: 'Text Embedding Ada 002',
+      id: 'text-embedding-ada-002',
+      capabilities: [
+        {
+          input: [ModelInputType.Text],
+          output: [ModelOutputType.Embedding],
+          defaultForOutputType: true,
+        },
+      ],
+    },
   ];
 
   protected instance!: AnthropicSDKProvider;
+
+  protected getBaseURL(): string {
+    return this.config.baseURL || 'https://api.anthropic.com/v1';
+  }
+
+  protected getApiKey(): string {
+    return this.config.apiKey;
+  }
 
   override configured(): boolean {
     return !!this.config.apiKey;

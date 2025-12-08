@@ -295,6 +295,24 @@ export class OpenAIProvider extends CopilotProvider<OpenAIConfig> {
         },
       ],
     },
+    {
+      id: 'text-embedding-ada-002',
+      capabilities: [
+        {
+          input: [ModelInputType.Text],
+          output: [ModelOutputType.Embedding],
+        },
+      ],
+    },
+    {
+      id: 'gemini-embedding-001',
+      capabilities: [
+        {
+          input: [ModelInputType.Text],
+          output: [ModelOutputType.Embedding],
+        },
+      ],
+    },
     // Image generation models
     {
       id: 'dall-e-3',
@@ -415,10 +433,8 @@ export class OpenAIProvider extends CopilotProvider<OpenAIConfig> {
 
       const [system, msgs] = await chatToGPTMessage(messages);
 
-      const modelInstance =
-        'responses' in this.#instance
-          ? this.#instance.responses(model.id)
-          : this.#instance(model.id);
+      // Force use of chat API instead of responses API for better LiteLLM compatibility
+      const modelInstance = this.#instance(model.id);
 
       const { text } = await generateText({
         model: modelInstance,
@@ -539,10 +555,8 @@ export class OpenAIProvider extends CopilotProvider<OpenAIConfig> {
         throw new CopilotPromptInvalid('Schema is required');
       }
 
-      const modelInstance =
-        'responses' in this.#instance
-          ? this.#instance.responses(model.id)
-          : this.#instance(model.id);
+      // Force use of chat API instead of responses API for better LiteLLM compatibility
+      const modelInstance = this.#instance(model.id);
 
       const { object } = await generateObject({
         model: modelInstance,
@@ -782,6 +796,10 @@ export class OpenAIProvider extends CopilotProvider<OpenAIConfig> {
     const fullCond = { ...cond, outputType: ModelOutputType.Embedding };
     await this.checkParams({ embeddings: messages, cond: fullCond, options });
     const model = this.selectModel(fullCond);
+
+    this.logger.debug(
+      `Embedding: requested modelId=${cond.modelId}, selected model=${model.id}`
+    );
 
     if (!('embedding' in this.#instance)) {
       throw new CopilotProviderNotSupported({
