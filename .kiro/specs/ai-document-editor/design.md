@@ -6,6 +6,96 @@ This design document outlines the architecture for enabling AFFiNE's AI Assistan
 
 The design follows a service-oriented architecture pattern consistent with AFFiNE's existing codebase, leveraging the @toeverything/infra framework for dependency injection and state management. All new components integrate with existing services (DocsService, CopilotClient, DatabaseBlockDataSource) to maximize code reuse and maintain architectural consistency.
 
+## Key Implementation Patterns (AFFiNE-Specific)
+
+### Accessing CopilotClient
+
+CopilotClient is NOT injected via dependency injection. It's accessed through the AIProvider singleton or created with GraphQL dependencies:
+
+```typescript
+// Pattern 1: Via AIProvider (for AI actions)
+import { AIProvider } from '@affine/core/blocksuite/ai/provider/ai-provider';
+const session = AIProvider.session;
+const context = AIProvider.context;
+
+// Pattern 2: Direct instantiation (for service layer)
+import { CopilotClient } from '@affine/core/blocksuite/ai/provider/copilot-client';
+const copilotClient = new CopilotClient(gqlFn, fetcherFn, eventSourceFn);
+```
+
+### Accessing DatabaseBlockDataSource
+
+DatabaseBlockDataSource is NOT a service - it's instantiated with a DatabaseBlockModel:
+
+```typescript
+import { DatabaseBlockDataSource } from '@blocksuite/affine/blocks/database';
+import type { DatabaseBlockModel } from '@blocksuite/affine/model';
+
+// Get the database model from a document
+const dbBlock = doc.blockSuiteDoc.getBlock(databaseBlockId);
+const dbModel = dbBlock.model as DatabaseBlockModel;
+
+// Create DataSource instance
+const dataSource = new DatabaseBlockDataSource(dbModel);
+
+// Now you can use all DataSource methods:
+dataSource.rowAdd('end');
+dataSource.cellValueChange(rowId, propertyId, value);
+dataSource.propertyAdd(position, { type, name });
+dataSource.viewDataAdd(viewData);
+```
+
+### Accessing Documents
+
+Documents are accessed via DocsService with a release pattern:
+
+```typescript
+// Open a document (increments reference count)
+const { doc, release } = docsService.open(docId);
+
+// Wait for sync if needed
+await doc.waitForSyncReady();
+
+// Access BlockSuite document
+const bsDoc = doc.blockSuiteDoc;
+
+// Add blocks
+bsDoc.addBlock('affine:paragraph', { text }, parentId);
+bsDoc.addBlock('affine:database', { columns: [], views: [] }, parentId);
+
+// IMPORTANT: Always release when done
+release();
+```
+
+### Module Structure
+
+New modules follow this structure in `packages/frontend/core/src/modules/`:
+
+```
+ai-document-editor/
+├── index.ts              # Module configuration and exports
+├── entities/             # Entity classes (state containers)
+├── services/             # Service classes (business logic)
+├── stores/               # Store classes (data access)
+└── types.ts              # Type definitions
+```
+
+Module registration pattern:
+
+```typescript
+// index.ts
+import type { Framework } from '@toeverything/infra';
+import { WorkspaceScope } from '../workspace';
+
+export function configureAIDocumentEditorModule(framework: Framework) {
+  framework
+    .scope(WorkspaceScope)
+    .service(AIDocumentEditorService, [DocsService, WorkspaceService])
+    .service(DatabaseReferenceService, [DocsService])
+    .service(ChangePreviewService);
+}
+```
+
 ## Architecture
 
 ### High-Level Architecture
@@ -80,13 +170,24 @@ The design follows a service-oriented architecture pattern consistent with AFFiN
 Primary service for handling AI-driven document editing operations.
 
 ```typescript
+import { Service } from '@toeverything/infra';
+import { DatabaseBlockDataSource } from '@blocksuite/affine/blocks/database';
+import type { DatabaseBlockModel } from '@blocksuite/affine/model';
+
 export class AIDocumentEditorService extends Service {
   constructor(
-    private copilotClient: CopilotClient,
-    private docsService: DocsService,
-    private workspaceService: WorkspaceService,
-    private changePreviewService: ChangePreviewService
-  ) {}
+    private readonly docsService: DocsService,
+    private readonly workspaceService: WorkspaceService
+  ) {
+    super();
+  }
+
+  // CopilotClient is accessed when needed, not injected
+  private getCopilotClient(): CopilotClient {
+    // Access via GraphQL service or create instance
+    const gql = this.workspaceService.workspace.graphql;
+    return new CopilotClient(gql, fetch, EventSource);
+  }
 
   /**
    * Parse a natural language command and execute the appropriate action
@@ -112,7 +213,29 @@ export class AIDocumentEditorService extends Service {
     docId: string,
     content: BlockContent,
     position?: InsertToPosition
-  ): Promise<string>; // returns block ID
+  ): Promise<string> {
+    const { doc, release } = this.docsService.open(docId);
+    try {
+      await doc.waitForSyncReady();
+      const bsDoc = doc.blockSuiteDoc;
+      
+      // Find parent block (note block)
+      const [noteBlock] = bsDoc.getBlocksByFlavour('affine:note');
+      if (!noteBlock) throw new Error('No note block found');
+      
+      // Add block
+      const blockId = bsDoc.addBlock(
+        content.type as any,
+        content.props,
+        noteBlock.id,
+        position ? insertPositionToIndex(position, noteBlock.children) : undefined
+      );
+      
+      return blockId;
+    } finally {
+      release();
+    }
+  }
 
   /**
    * Create a new database block
@@ -121,7 +244,48 @@ export class AIDocumentEditorService extends Service {
     docId: string,
     config: DatabaseConfig,
     position?: InsertToPosition
-  ): Promise<string>; // returns database block ID
+  ): Promise<string> {
+    const { doc, release } = this.docsService.open(docId);
+    try {
+      await doc.waitForSyncReady();
+      const bsDoc = doc.blockSuiteDoc;
+      
+      const [noteBlock] = bsDoc.getBlocksByFlavour('affine:note');
+      if (!noteBlock) throw new Error('No note block found');
+      
+      // Create database block
+      const dbId = bsDoc.addBlock(
+        'affine:database',
+        { columns: [], views: [] },
+        noteBlock.id,
+        position ? insertPositionToIndex(position, noteBlock.children) : undefined
+      );
+      
+      // Get the model and create DataSource
+      const dbBlock = bsDoc.getBlock(dbId);
+      const dbModel = dbBlock?.model as DatabaseBlockModel;
+      const dataSource = new DatabaseBlockDataSource(dbModel);
+      
+      // Configure columns
+      for (const col of config.columns) {
+        dataSource.propertyAdd('end', { type: col.type, name: col.name });
+      }
+      
+      // Add initial view
+      dataSource.viewManager.viewAdd(config.viewType);
+      
+      // Add initial rows if specified
+      if (config.initialRows) {
+        for (const row of config.initialRows) {
+          dataSource.rowAdd('end');
+        }
+      }
+      
+      return dbId;
+    } finally {
+      release();
+    }
+  }
 
   /**
    * Get the currently active document context
@@ -132,39 +296,141 @@ export class AIDocumentEditorService extends Service {
 
 ### DatabaseReferenceService
 
-Service for managing database references across documents.
+Service for managing database references across documents. This service creates a NEW block type that renders the source database inline with full interactivity.
 
 ```typescript
+import { Service } from '@toeverything/infra';
+import { DatabaseBlockDataSource } from '@blocksuite/affine/blocks/database';
+import type { DatabaseBlockModel } from '@blocksuite/affine/model';
+
 export class DatabaseReferenceService extends Service {
   constructor(
-    private docsService: DocsService,
-    private workspaceService: WorkspaceService
-  ) {}
+    private readonly docsService: DocsService
+  ) {
+    super();
+  }
 
   /**
-   * Create a reference to an existing database in another document
+   * Create a reference to an existing database in another document.
+   * This creates a new 'affine:database-reference' block that renders
+   * the source database with full interactivity.
    */
   async createReference(
     targetDocId: string,
+    sourceDocId: string,
     sourceDatabaseId: string,
     viewId?: string,
     position?: InsertToPosition
-  ): Promise<string>; // returns reference block ID
+  ): Promise<string> {
+    // Validate source database exists
+    const sourceRef = this.docsService.open(sourceDocId);
+    try {
+      await sourceRef.doc.waitForSyncReady();
+      const sourceDb = sourceRef.doc.blockSuiteDoc.getBlock(sourceDatabaseId);
+      if (!sourceDb || sourceDb.flavour !== 'affine:database') {
+        throw new DatabaseReferenceError(
+          'Source database not found',
+          sourceDatabaseId,
+          targetDocId
+        );
+      }
+    } finally {
+      sourceRef.release();
+    }
+    
+    // Create reference block in target document
+    const targetRef = this.docsService.open(targetDocId);
+    try {
+      await targetRef.doc.waitForSyncReady();
+      const bsDoc = targetRef.doc.blockSuiteDoc;
+      
+      const [noteBlock] = bsDoc.getBlocksByFlavour('affine:note');
+      if (!noteBlock) throw new Error('No note block found');
+      
+      // Create the reference block (new block type)
+      const refBlockId = bsDoc.addBlock(
+        'affine:database-reference' as any,
+        {
+          sourceDocId,
+          sourceDatabaseId,
+          viewId, // Optional: specific view to display
+        },
+        noteBlock.id,
+        position ? insertPositionToIndex(position, noteBlock.children) : undefined
+      );
+      
+      return refBlockId;
+    } finally {
+      targetRef.release();
+    }
+  }
+
+  /**
+   * Get the DataSource for a database reference.
+   * This returns a DataSource connected to the SOURCE database,
+   * allowing full read/write operations.
+   */
+  async getDataSourceForReference(
+    referenceDocId: string,
+    referenceBlockId: string
+  ): Promise<{ dataSource: DatabaseBlockDataSource; release: () => void }> {
+    const refDoc = this.docsService.open(referenceDocId);
+    await refDoc.doc.waitForSyncReady();
+    
+    const refBlock = refDoc.doc.blockSuiteDoc.getBlock(referenceBlockId);
+    if (!refBlock) {
+      refDoc.release();
+      throw new Error('Reference block not found');
+    }
+    
+    const { sourceDocId, sourceDatabaseId } = refBlock.model.props as any;
+    
+    // Open source document and get database
+    const sourceDoc = this.docsService.open(sourceDocId);
+    await sourceDoc.doc.waitForSyncReady();
+    
+    const dbBlock = sourceDoc.doc.blockSuiteDoc.getBlock(sourceDatabaseId);
+    if (!dbBlock) {
+      refDoc.release();
+      sourceDoc.release();
+      throw new DatabaseReferenceError(
+        'Source database no longer exists',
+        sourceDatabaseId,
+        referenceDocId
+      );
+    }
+    
+    const dbModel = dbBlock.model as DatabaseBlockModel;
+    const dataSource = new DatabaseBlockDataSource(dbModel);
+    
+    return {
+      dataSource,
+      release: () => {
+        refDoc.release();
+        sourceDoc.release();
+      }
+    };
+  }
 
   /**
    * Find all references to a given database
    */
-  async findReferences(databaseId: string): Promise<DatabaseReference[]>;
-
-  /**
-   * Update all references when source database changes
-   */
-  async syncReferences(databaseId: string, changes: DatabaseChanges): Promise<void>;
+  async findReferences(sourceDocId: string, databaseId: string): Promise<DatabaseReference[]>;
 
   /**
    * Validate that a database reference target exists
    */
-  async validateReference(databaseId: string): Promise<boolean>;
+  async validateReference(sourceDocId: string, databaseId: string): Promise<boolean> {
+    try {
+      const docRef = this.docsService.open(sourceDocId);
+      await docRef.doc.waitForSyncReady();
+      const block = docRef.doc.blockSuiteDoc.getBlock(databaseId);
+      docRef.release();
+      return block?.flavour === 'affine:database';
+    } catch {
+      return false;
+    }
+  }
 }
 ```
 
@@ -608,38 +874,235 @@ Specific edge cases identified in requirements:
 
 The implementation maximizes reuse of existing AFFiNE components:
 
-1. **CopilotClient**: All AI communication uses existing methods (`createSession`, `createMessage`, `chatTextStream`, `applyDocUpdates`)
+1. **CopilotClient**: Accessed via AIProvider or instantiated with GraphQL dependencies
+   ```typescript
+   // Via AIProvider for AI actions
+   const session = AIProvider.session;
+   
+   // Or direct instantiation
+   const client = new CopilotClient(gql, fetcher, eventSource);
+   client.applyDocUpdates(workspaceId, docId, op, updates);
+   ```
 
-2. **DocsService**: Document access and manipulation uses existing service methods
+2. **DocsService**: Document access uses the open/release pattern
+   ```typescript
+   const { doc, release } = docsService.open(docId);
+   try {
+     await doc.waitForSyncReady();
+     // Use doc.blockSuiteDoc for operations
+   } finally {
+     release();
+   }
+   ```
 
-3. **DatabaseBlockDataSource**: Database operations use existing methods (`rowAdd`, `cellValueChange`, `propertyAdd`, `viewDataAdd`, `viewDataUpdate`)
+3. **DatabaseBlockDataSource**: Instantiated with DatabaseBlockModel
+   ```typescript
+   const dbBlock = doc.blockSuiteDoc.getBlock(databaseId);
+   const dbModel = dbBlock.model as DatabaseBlockModel;
+   const dataSource = new DatabaseBlockDataSource(dbModel);
+   
+   // Use DataSource methods
+   dataSource.rowAdd('end');
+   dataSource.cellValueChange(rowId, propertyId, value);
+   dataSource.propertyAdd(position, { type, name });
+   dataSource.viewDataAdd(viewData);
+   dataSource.viewDataUpdate(viewId, updater);
+   ```
 
-4. **Block Creation**: Uses existing `doc.addBlock()` and `insertPositionToIndex()` utilities
+4. **Block Creation**: Uses BlockSuite's addBlock method
+   ```typescript
+   const blockId = doc.blockSuiteDoc.addBlock(
+     'affine:paragraph',
+     { text: new Text([{ insert: 'Hello' }]) },
+     parentId,
+     index
+   );
+   ```
 
-5. **Y.js Synchronization**: Leverages existing CRDT-based synchronization for real-time updates
+5. **Y.js Synchronization**: Automatic via BlockSuite - all changes to doc.blockSuiteDoc are synced
 
-6. **Service Architecture**: Follows @toeverything/infra patterns (Service, Entity, Store)
+6. **Service Architecture**: Follows @toeverything/infra patterns
+   ```typescript
+   export class MyService extends Service {
+     constructor(
+       private readonly docsService: DocsService,
+       private readonly workspaceService: WorkspaceService
+     ) {
+       super();
+     }
+   }
+   ```
 
-7. **GraphQL**: Extends existing mutations/queries rather than creating new communication channels
+7. **GraphQL**: Uses existing mutations/queries from @affine/graphql
+   ```typescript
+   import { applyDocUpdatesQuery } from '@affine/graphql';
+   ```
+
+### New Block Type Registration
+
+The `affine:database-reference` block must be registered in the BlockSuite schema:
+
+```typescript
+// In blocksuite/affine/model/src/blocks/index.ts
+export * from './database-reference/database-reference-model.js';
+
+// In blocksuite/affine/blocks/database-reference/index.ts
+export * from './database-reference-block.js';
+
+// Register in schema
+import { DatabaseReferenceBlockSchema } from '@blocksuite/affine-model';
+import { DatabaseReferenceBlock } from '@blocksuite/affine-blocks';
+
+// Add to block specs
+BlockViewExtension('affine:database-reference', literal`affine-database-reference`);
+```
 
 ### Database Reference Implementation
 
-Database references are implemented as a new block type that extends the existing database block:
+Database references are implemented as a **NEW block type** (`affine:database-reference`) that renders the source database inline with full interactivity. This is NOT a link - it's a complete, editable view of the database.
+
+#### Block Schema Definition
 
 ```typescript
-// New block type: 'affine:database-reference'
-interface DatabaseReferenceBlock {
-  flavour: 'affine:database-reference';
-  sourceId: string; // ID of source database block
-  viewId?: string; // Optional specific view
-  isLinked: true; // Marker for reference blocks
+// New file: blocksuite/affine/model/src/blocks/database-reference/database-reference-model.ts
+import { defineBlockSchema } from '@blocksuite/store';
+
+export interface DatabaseReferenceBlockProps {
+  sourceDocId: string;      // Document containing the source database
+  sourceDatabaseId: string; // Block ID of the source database
+  viewId?: string;          // Optional: specific view to display
+}
+
+export const DatabaseReferenceBlockSchema = defineBlockSchema({
+  flavour: 'affine:database-reference',
+  props: (): DatabaseReferenceBlockProps => ({
+    sourceDocId: '',
+    sourceDatabaseId: '',
+    viewId: undefined,
+  }),
+  metadata: {
+    version: 1,
+    role: 'content',
+    parent: ['affine:note'],
+    children: [], // No children - renders source database
+  },
+});
+```
+
+#### Block Component
+
+```typescript
+// New file: blocksuite/affine/blocks/database-reference/database-reference-block.ts
+import { DatabaseBlockDataSource } from '@blocksuite/affine/blocks/database';
+import type { DatabaseBlockModel } from '@blocksuite/affine/model';
+
+@customElement('affine-database-reference')
+export class DatabaseReferenceBlock extends BlockComponent {
+  private dataSource: DatabaseBlockDataSource | null = null;
+  private sourceDocRef: { release: () => void } | null = null;
+  
+  override connectedCallback() {
+    super.connectedCallback();
+    this.loadSourceDatabase();
+  }
+  
+  override disconnectedCallback() {
+    super.disconnectedCallback();
+    this.sourceDocRef?.release();
+  }
+  
+  private async loadSourceDatabase() {
+    const { sourceDocId, sourceDatabaseId, viewId } = this.model.props;
+    
+    // Open source document
+    const docsService = this.std.get(DocsService);
+    this.sourceDocRef = docsService.open(sourceDocId);
+    await this.sourceDocRef.doc.waitForSyncReady();
+    
+    // Get database model
+    const dbBlock = this.sourceDocRef.doc.blockSuiteDoc.getBlock(sourceDatabaseId);
+    if (!dbBlock || dbBlock.flavour !== 'affine:database') {
+      this.renderError('Source database not found');
+      return;
+    }
+    
+    const dbModel = dbBlock.model as DatabaseBlockModel;
+    this.dataSource = new DatabaseBlockDataSource(dbModel);
+    
+    // If viewId specified, filter to that view
+    if (viewId) {
+      this.dataSource.viewManager.setCurrentView(viewId);
+    }
+    
+    this.requestUpdate();
+  }
+  
+  override render() {
+    if (!this.dataSource) {
+      return html`<div class="loading">Loading database...</div>`;
+    }
+    
+    // Render the SAME database component used for regular databases
+    // All edits go directly to the source database via DataSource
+    return html`
+      <affine-database-table
+        .dataSource=${this.dataSource}
+        .view=${this.dataSource.viewManager.currentView$.value}
+      ></affine-database-table>
+    `;
+  }
 }
 ```
 
-The reference block uses the same DatabaseBlockDataSource but wraps operations to:
-- Forward all data operations to the source database
-- Subscribe to source database changes
-- Maintain view-specific filtering if viewId is specified
+#### How Synchronization Works
+
+1. **DataSource connects to source model**: The `DatabaseBlockDataSource` is created with the source database's model, not a copy
+2. **All operations go to source**: When you call `dataSource.rowAdd()` or `dataSource.cellValueChange()`, it modifies the source database directly
+3. **Y.js handles sync**: The source document's Y.js doc propagates changes to all connected clients
+4. **References auto-update**: Since references use the same DataSource, they see changes immediately
+
+```
+┌─────────────────────┐     ┌─────────────────────┐
+│     Document A      │     │     Document B      │
+│  ┌───────────────┐  │     │  ┌───────────────┐  │
+│  │ affine:database│◄─┼─────┼──│ affine:database│  │
+│  │ (source)      │  │     │  │ -reference    │  │
+│  │               │  │     │  │               │  │
+│  │ DatabaseBlock │  │     │  │ Uses same     │  │
+│  │ DataSource    │◄─┼─────┼──│ DataSource    │  │
+│  └───────────────┘  │     │  └───────────────┘  │
+└─────────────────────┘     └─────────────────────┘
+         │                           │
+         └───────────┬───────────────┘
+                     │
+              ┌──────▼──────┐
+              │   Y.js Doc  │
+              │ (source doc)│
+              │             │
+              │ Syncs to    │
+              │ all clients │
+              └─────────────┘
+```
+
+#### View-Specific References
+
+When a `viewId` is specified, the reference shows only that specific view:
+
+```typescript
+// Create reference to specific view
+await databaseReferenceService.createReference(
+  targetDocId,
+  sourceDocId,
+  sourceDatabaseId,
+  'kanban-view-id' // Only show this view
+);
+
+// The reference block will:
+// 1. Load the source database
+// 2. Set the view manager to the specified view
+// 3. Render only that view (with its filters/sorting)
+// 4. Edits still go to source database
+```
 
 ### Context Management
 
