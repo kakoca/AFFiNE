@@ -1,21 +1,21 @@
 # Implementation Plan
 
-- [ ] 1. Set up core infrastructure and type definitions
+- [x] 1. Set up core infrastructure and type definitions
   - Create new module at `packages/frontend/core/src/modules/ai-document-editor/`
   - Create base types and interfaces for document operations, database references, and command parsing
   - Define error types extending existing AFFiNE error classes (DocumentEditError, DatabaseReferenceError, CommandParseError)
   - Set up module structure following @toeverything/infra patterns (services/, entities/, stores/, types.ts, index.ts)
   - _Requirements: 9.1, 9.5, 11.8, 11.9_
 
-- [ ] 2. Create the affine:database-reference block type
-  - [ ] 2.1 Define DatabaseReferenceBlockSchema in blocksuite/affine/model
+- [x] 2. Create the affine:database-reference block type
+  - [x] 2.1 Define DatabaseReferenceBlockSchema in blocksuite/affine/model
     - Create `blocksuite/affine/model/src/blocks/database-reference/database-reference-model.ts`
     - Define props: sourceDocId, sourceDatabaseId, viewId
     - Set metadata: parent=['affine:note'], children=[]
     - Export from blocksuite/affine/model/src/blocks/index.ts
     - _Requirements: 4.1, 11.4_
 
-  - [ ] 2.2 Implement DatabaseReferenceBlock component in blocksuite/affine/blocks
+  - [x] 2.2 Implement DatabaseReferenceBlock component in blocksuite/affine/blocks
     - Create `blocksuite/affine/blocks/database-reference/` directory
     - Implement block component that loads source database via DocsService
     - Create DatabaseBlockDataSource from source database model
@@ -23,7 +23,7 @@
     - Handle view-specific rendering when viewId is specified
     - _Requirements: 4.2, 4.4, 5.2_
 
-  - [ ] 2.3 Register block type in BlockSuite
+  - [x] 2.3 Register block type in BlockSuite
     - Add FlavourExtension and BlockViewExtension for 'affine:database-reference'
     - Register in appropriate extension configuration
     - _Requirements: 11.4_
@@ -32,8 +32,8 @@
     - **Property 10: Database reference points to source**
     - **Validates: Requirements 4.1**
 
-- [ ] 3. Implement CommandParser utility
-  - [ ] 3.1 Create CommandParser class with parsing logic
+- [x] 3. Implement CommandParser utility
+  - [x] 3.1 Create CommandParser class with parsing logic
     - Implement command type detection (edit, add, create, reference)
     - Implement target document extraction from commands
     - Handle context-based document resolution ("this page", "current document")
@@ -43,8 +43,8 @@
     - **Property 1: Command parsing identifies target document**
     - **Validates: Requirements 1.1, 6.1, 6.3**
 
-- [ ] 4. Implement DocumentContextManager
-  - [ ] 4.1 Create DocumentContextManager class
+- [x] 4. Implement DocumentContextManager
+  - [x] 4.1 Create DocumentContextManager class
     - Implement active document tracking with observables
     - Implement context enrichment with database information (scan for affine:database blocks)
     - Handle multiple open documents with focus detection via WorkbenchService
@@ -58,8 +58,8 @@
     - **Property 19: Multiple open documents use focused editor**
     - **Validates: Requirements 6.4**
 
-- [ ] 5. Implement ChangePreviewService
-  - [ ] 5.1 Create ChangePreviewService class
+- [x] 5. Implement ChangePreviewService
+  - [x] 5.1 Create ChangePreviewService class
     - Implement preview generation using document cloning and diff
     - Implement change application with transaction support (doc.blockSuiteDoc.transact)
     - Implement preview discard functionality
@@ -69,8 +69,8 @@
     - **Property 20: Preview rejection leaves document unchanged**
     - **Validates: Requirements 7.4**
 
-- [ ] 6. Implement core AIDocumentEditorService
-  - [ ] 6.1 Create AIDocumentEditorService class structure
+- [x] 6. Implement core AIDocumentEditorService
+  - [x] 6.1 Create AIDocumentEditorService class structure
     - Set up service extending Service from @toeverything/infra
     - Inject DocsService and WorkspaceService via constructor
     - Implement getCopilotClient() method to access CopilotClient
@@ -78,7 +78,7 @@
     - Implement executeCommand() orchestration method
     - _Requirements: 1.1, 9.1, 11.1, 11.5_
 
-  - [ ] 6.2 Implement editDocument() method
+  - [x] 6.2 Implement editDocument() method
     - Access CopilotClient via getCopilotClient()
     - Use existing applyDocUpdates for applying changes
     - Implement transaction rollback on failure using doc.blockSuiteDoc.transact
@@ -92,7 +92,7 @@
     - **Property 21: Failed operations roll back completely**
     - **Validates: Requirements 8.1**
 
-  - [ ] 6.5 Implement addContent() method
+  - [x] 6.5 Implement addContent() method
     - Use docsService.open() to access document
     - Use doc.blockSuiteDoc.addBlock() for block creation
     - Handle position specification with insertPositionToIndex from @blocksuite/affine-shared/utils
@@ -120,8 +120,8 @@
 - [ ] 7. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 8. Implement database creation in AIDocumentEditorService
-  - [ ] 8.1 Implement createDatabase() method
+- [x] 8. Implement database creation in AIDocumentEditorService
+  - [x] 8.1 Implement createDatabase() method
     - Use doc.blockSuiteDoc.addBlock('affine:database', ...) to create database block
     - Get DatabaseBlockModel from created block
     - Create DatabaseBlockDataSource with the model: new DatabaseBlockDataSource(dbModel)
@@ -139,15 +139,15 @@
     - **Property 9: Database creation returns valid identifier**
     - **Validates: Requirements 3.5**
 
-- [ ] 9. Implement DatabaseReferenceService
-  - [ ] 9.1 Create DatabaseReferenceService class
+- [x] 9. Implement DatabaseReferenceService
+  - [x] 9.1 Create DatabaseReferenceService class
     - Implement createReference() method that creates affine:database-reference block
     - Store sourceDocId, sourceDatabaseId, and optional viewId in block props
     - Implement findReferences() to locate all references to a database
     - Implement validateReference() to check target existence
     - _Requirements: 4.1, 8.3, 11.4_
 
-  - [ ] 9.2 Implement getDataSourceForReference() method
+  - [x] 9.2 Implement getDataSourceForReference() method
     - Open source document via docsService.open()
     - Get source database block and model
     - Create and return DatabaseBlockDataSource connected to source
@@ -162,7 +162,7 @@
     - **Property 16: View reference edits update source**
     - **Validates: Requirements 5.4**
 
-  - [ ] 9.5 Implement view-specific reference support in block component
+  - [x] 9.5 Implement view-specific reference support in block component
     - Handle viewId parameter in DatabaseReferenceBlock
     - Use dataSource.viewManager.setCurrentView(viewId) for specific view
     - Preserve view configuration (filters, sorting) from source
@@ -180,7 +180,7 @@
     - **Property 15: View references preserve configuration**
     - **Validates: Requirements 5.3**
 
-  - [ ] 9.9 Implement reference stability across document moves
+  - [x] 9.9 Implement reference stability across document moves
     - Use stable block IDs (sourceDocId + sourceDatabaseId) rather than document-relative paths
     - Reference remains valid as long as source database exists
     - _Requirements: 4.5_
@@ -193,11 +193,11 @@
     - **Property 17: Source view changes propagate to references**
     - **Validates: Requirements 5.5**
 
-- [ ] 10. Checkpoint - Ensure all tests pass
+- [x] 10. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 11. Implement database manipulation methods
-  - [ ] 11.1 Add database row insertion to AIDocumentEditorService
+- [x] 11. Implement database manipulation methods
+  - [x] 11.1 Add database row insertion to AIDocumentEditorService
     - Get DatabaseBlockDataSource for target database
     - Use dataSource.rowAdd(position) method
     - Parse row data from natural language commands
@@ -207,7 +207,7 @@
     - **Property 22: Database row insertion adds rows**
     - **Validates: Requirements 10.1**
 
-  - [ ] 11.3 Add cell update functionality
+  - [x] 11.3 Add cell update functionality
     - Use dataSource.cellValueChange(rowId, propertyId, value) method
     - Parse cell coordinates and values from commands
     - _Requirements: 10.2, 11.2_
@@ -216,7 +216,7 @@
     - **Property 23: Cell updates modify specified cells**
     - **Validates: Requirements 10.2**
 
-  - [ ] 11.5 Add view configuration functionality
+  - [x] 11.5 Add view configuration functionality
     - Use dataSource.viewDataUpdate(viewId, updater) method
     - Apply filters and sorting from commands
     - _Requirements: 10.3, 11.2_
@@ -225,7 +225,7 @@
     - **Property 24: View configuration applies filters and sorting**
     - **Validates: Requirements 10.3**
 
-  - [ ] 11.7 Add new view creation functionality
+  - [x] 11.7 Add new view creation functionality
     - Use dataSource.viewManager.viewAdd(viewType) method
     - Configure view with specified settings
     - _Requirements: 10.4, 11.2_
@@ -234,8 +234,8 @@
     - **Property 25: New view creation adds view with settings**
     - **Validates: Requirements 10.4**
 
-- [ ] 12. Implement real-time synchronization
-  - [ ] 12.1 Verify Y.js synchronization works for database references
+- [x] 12. Implement real-time synchronization
+  - [x] 12.1 Verify Y.js synchronization works for database references
     - Ensure edits through DatabaseReferenceBlock trigger Y.js updates on source doc
     - Verify changes propagate to all clients viewing source or references
     - _Requirements: 1.5, 11.6_
@@ -244,77 +244,77 @@
     - **Property 3: Multi-session synchronization propagates edits**
     - **Validates: Requirements 1.5**
 
-- [ ] 13. Implement module registration
-  - [ ] 13.1 Create module configuration function
+- [x] 13. Implement module registration
+  - [x] 13.1 Create module configuration function
     - Create configureAIDocumentEditorModule(framework) function
     - Register AIDocumentEditorService, DatabaseReferenceService, ChangePreviewService
     - Register in WorkspaceScope
     - Export from module index.ts
     - _Requirements: 11.9_
 
-  - [ ] 13.2 Integrate module into AFFiNE
+  - [x] 13.2 Integrate module into AFFiNE
     - Import and call configureAIDocumentEditorModule in app initialization
     - _Requirements: 11.9_
 
-- [ ] 14. Implement UI components
-  - [ ] 14.1 Create AI command input component
+- [x] 14. Implement UI components
+  - [x] 14.1 Create AI command input component
     - Extend existing chat panel with document editing capabilities
     - Add command suggestions and autocomplete
     - Follow existing component patterns and design system
     - _Requirements: 11.7_
 
-  - [ ] 14.2 Create change preview dialog component
+  - [x] 14.2 Create change preview dialog component
     - Display additions, modifications, and deletions
     - Provide approve/reject/modify actions
     - Use existing dialog components and styling
     - _Requirements: 7.1, 7.2, 7.5, 11.7_
 
-- [ ] 15. Implement error handling and user feedback
-  - [ ] 15.1 Add error handling to all service methods
+- [x] 15. Implement error handling and user feedback
+  - [x] 15.1 Add error handling to all service methods
     - Wrap operations in try-catch with proper error types
     - Implement transaction rollback on errors using doc.blockSuiteDoc.transact
     - Always call release() in finally blocks
     - _Requirements: 8.1, 8.2, 9.5, 11.8_
 
-  - [ ] 15.2 Add user-friendly error messages
+  - [x] 15.2 Add user-friendly error messages
     - Translate technical errors to actionable messages
     - Provide suggestions for common error scenarios (database not found, permission denied)
     - _Requirements: 8.2, 8.3, 8.4_
 
-  - [ ] 15.3 Implement retry logic for network errors
+  - [x] 15.3 Implement retry logic for network errors
     - Add exponential backoff for failed CopilotClient operations
     - Queue operations during network interruptions
     - _Requirements: 8.5_
 
-- [ ] 16. Final checkpoint - Ensure all tests pass
+- [x] 16. Final checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 17. Integration and end-to-end testing
-  - [ ] 17.1 Test complete command execution flows
+- [x] 17. Integration and end-to-end testing
+  - [x] 17.1 Test complete command execution flows
     - Test edit command from chat to document update
     - Test database creation and manipulation
     - Test database reference creation and synchronization
     - _Requirements: All_
 
-  - [ ] 17.2 Test multi-user scenarios
+  - [x] 17.2 Test multi-user scenarios
     - Test concurrent edits from multiple users
     - Test reference synchronization across users
     - _Requirements: 1.5, 4.3_
 
-  - [ ] 17.3 Test edge cases
+  - [x] 17.3 Test edge cases
     - Test empty document handling
     - Test no active document scenario
     - Test invalid reference targets (source database deleted)
     - Test permission-denied scenarios
     - _Requirements: 8.3, 8.4_
 
-- [ ] 18. Documentation and examples
-  - [ ] 18.1 Document AI command syntax
+- [x] 18. Documentation and examples
+  - [x] 18.1 Document AI command syntax
     - Create command reference guide
     - Provide examples for common operations
     - Document database reference syntax
 
-  - [ ] 18.2 Create developer documentation
+  - [x] 18.2 Create developer documentation
     - Document service APIs
     - Provide integration examples
     - Document extension points for future features

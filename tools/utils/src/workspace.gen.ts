@@ -180,6 +180,21 @@ export const PackageList = [
     ],
   },
   {
+    location: 'blocksuite/affine/blocks/database-reference',
+    name: '@blocksuite/affine-block-database-reference',
+    workspaceDependencies: [
+      'blocksuite/affine/blocks/database',
+      'blocksuite/affine/components',
+      'blocksuite/affine/ext-loader',
+      'blocksuite/affine/model',
+      'blocksuite/affine/shared',
+      'blocksuite/affine/data-view',
+      'blocksuite/framework/global',
+      'blocksuite/framework/std',
+      'blocksuite/framework/store',
+    ],
+  },
+  {
     location: 'blocksuite/affine/blocks/divider',
     name: '@blocksuite/affine-block-divider',
     workspaceDependencies: [
@@ -1496,6 +1511,7 @@ export type PackageName =
   | '@blocksuite/affine-block-code'
   | '@blocksuite/affine-block-data-view'
   | '@blocksuite/affine-block-database'
+  | '@blocksuite/affine-block-database-reference'
   | '@blocksuite/affine-block-divider'
   | '@blocksuite/affine-block-edgeless-text'
   | '@blocksuite/affine-block-embed'

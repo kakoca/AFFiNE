@@ -10,6 +10,7 @@ import {
   configureAIReasoningModule,
   configureAIToolsConfigModule,
 } from './ai-button';
+import { configureAIDocumentEditorModule } from './ai-document-editor';
 import { configureAppSidebarModule } from './app-sidebar';
 import { configAtMenuConfigModule } from './at-menu-config';
 import { configureBlobManagementModule } from './blob-management';
@@ -121,6 +122,7 @@ export function configureCommonModules(framework: Framework) {
   configureAIDraftModule(framework);
   configureAIToolsConfigModule(framework);
   configureAIModelModule(framework);
+  configureAIDocumentEditorModule(framework);
   configureTemplateDocModule(framework);
   configureBlobManagementModule(framework);
   configureMediaModule(framework);
