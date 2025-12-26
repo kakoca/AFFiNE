@@ -23,11 +23,11 @@ export const submitButton = style({
   fontSize: '14px',
   fontWeight: 500,
   transition: 'opacity 0.2s',
-  
+
   ':hover': {
     opacity: 0.9,
   },
-  
+
   ':disabled': {
     opacity: 0.5,
     cursor: 'not-allowed',

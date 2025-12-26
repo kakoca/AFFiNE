@@ -28,5 +28,6 @@ export const DatabaseReferenceBlockSchema = defineBlockSchema({
   toModel: () => new DatabaseReferenceBlockModel(),
 });
 
-export const DatabaseReferenceBlockSchemaExtension =
-  BlockSchemaExtension(DatabaseReferenceBlockSchema);
+export const DatabaseReferenceBlockSchemaExtension = BlockSchemaExtension(
+  DatabaseReferenceBlockSchema
+);

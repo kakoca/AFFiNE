@@ -9,6 +9,7 @@
 **File**: `packages/frontend/core/src/modules/ai-document-editor/services/ai-document-editor.ts`
 
 **Implementation Details**:
+
 - Created `AIDocumentEditorService` class extending `Service` from `@toeverything/infra`
 - Injected required dependencies via constructor:
   - `DocsService` - for document access
@@ -34,6 +35,7 @@
 #### 6.2 Implement editDocument() method ✅
 
 **Implementation Details**:
+
 - Opens target document using DocsService.open()
 - Waits for document sync with `doc.waitForSyncReady()`
 - Gets workspace ID from WorkspaceService
@@ -57,6 +59,7 @@
 #### 6.5 Implement addContent() method ✅
 
 **Implementation Details**:
+
 - Opens target document using DocsService.open()
 - Waits for document sync
 - Finds parent note block:
@@ -101,6 +104,7 @@
 ### Testing
 
 Created comprehensive unit tests in `__tests__/ai-document-editor.spec.ts`:
+
 - Tests for `getActiveDocumentContext()`
 - Tests for `executeCommand()`
 - Tests for `editDocument()`
@@ -112,6 +116,7 @@ Created comprehensive unit tests in `__tests__/ai-document-editor.spec.ts`:
 ### Next Steps
 
 The following tasks remain to be implemented:
+
 - Task 6.3: Property test for content preservation (optional)
 - Task 6.4: Property test for operation rollback (optional)
 - Task 6.6-6.9: Property tests for addContent (optional)

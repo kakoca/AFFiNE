@@ -9,13 +9,13 @@ import type { DatabaseReference } from '../types';
 
 /**
  * DatabaseReferenceService manages database references across documents.
- * 
+ *
  * This service:
  * - Creates references to existing databases in other documents
  * - Provides DataSource access for referenced databases
  * - Validates reference targets
  * - Finds all references to a given database
- * 
+ *
  * Requirements: 4.1, 8.3, 11.4
  */
 export class DatabaseReferenceService extends Service {
@@ -27,13 +27,13 @@ export class DatabaseReferenceService extends Service {
    * Create a reference to an existing database in another document.
    * This creates a new 'affine:database-reference' block that renders
    * the source database with full interactivity.
-   * 
+   *
    * The reference uses stable block IDs (sourceDocId + sourceDatabaseId) rather
    * than document-relative paths, ensuring the reference remains valid even if
    * the source database is moved to another document (Requirement 4.5).
-   * 
+   *
    * Requirements: 4.1, 4.5, 11.4
-   * 
+   *
    * @param targetDocId - Document where the reference will be created
    * @param sourceDocId - Document containing the source database
    * @param sourceDatabaseId - ID of the source database block
@@ -50,12 +50,12 @@ export class DatabaseReferenceService extends Service {
   ): Promise<string> {
     let sourceRelease: (() => void) | null = null;
     let targetRelease: (() => void) | null = null;
-    
+
     try {
       // Validate source database exists
       const sourceRef = this.docsService.open(sourceDocId);
       sourceRelease = sourceRef.release;
-      
+
       try {
         await sourceRef.doc.waitForSyncReady();
         const sourceDb = sourceRef.doc.blockSuiteDoc.getBlock(sourceDatabaseId);
@@ -77,7 +77,7 @@ export class DatabaseReferenceService extends Service {
       // Create reference block in target document
       const targetRef = this.docsService.open(targetDocId);
       targetRelease = targetRef.release;
-      
+
       await targetRef.doc.waitForSyncReady();
       const bsDoc = targetRef.doc.blockSuiteDoc;
 
@@ -102,7 +102,7 @@ export class DatabaseReferenceService extends Service {
 
       // Use transaction to ensure atomicity (Requirement 8.1)
       let refBlockId: string | null = null;
-      
+
       try {
         bsDoc.transact(() => {
           // Create the reference block (new block type)
@@ -165,9 +165,9 @@ export class DatabaseReferenceService extends Service {
    * Get the DataSource for a database reference.
    * This returns a DataSource connected to the SOURCE database,
    * allowing full read/write operations.
-   * 
+   *
    * Requirements: 4.3, 5.4
-   * 
+   *
    * @param referenceDocId - Document containing the reference
    * @param referenceBlockId - ID of the reference block
    * @returns DataSource and release function
@@ -178,11 +178,11 @@ export class DatabaseReferenceService extends Service {
   ): Promise<{ dataSource: DatabaseBlockDataSource; release: () => void }> {
     let refRelease: (() => void) | null = null;
     let sourceRelease: (() => void) | null = null;
-    
+
     try {
       const refDoc = this.docsService.open(referenceDocId);
       refRelease = refDoc.release;
-      
+
       await refDoc.doc.waitForSyncReady();
 
       const refBlock = refDoc.doc.blockSuiteDoc.getBlock(referenceBlockId);
@@ -199,7 +199,7 @@ export class DatabaseReferenceService extends Service {
       // Open source document and get database
       const sourceDoc = this.docsService.open(sourceDocId);
       sourceRelease = sourceDoc.release;
-      
+
       await sourceDoc.doc.waitForSyncReady();
 
       const dbBlock = sourceDoc.doc.blockSuiteDoc.getBlock(sourceDatabaseId);
@@ -235,7 +235,7 @@ export class DatabaseReferenceService extends Service {
       if (sourceRelease) {
         sourceRelease();
       }
-      
+
       if (error instanceof DatabaseReferenceError) {
         throw error;
       }
@@ -250,9 +250,9 @@ export class DatabaseReferenceService extends Service {
 
   /**
    * Find all references to a given database
-   * 
+   *
    * Requirements: 8.3
-   * 
+   *
    * @param sourceDocId - Document containing the source database
    * @param databaseId - ID of the database block
    * @returns Array of database references
@@ -275,9 +275,9 @@ export class DatabaseReferenceService extends Service {
 
   /**
    * Validate that a database reference target exists
-   * 
+   *
    * Requirements: 8.3
-   * 
+   *
    * @param sourceDocId - Document containing the database
    * @param databaseId - ID of the database block
    * @returns True if the database exists
@@ -287,11 +287,11 @@ export class DatabaseReferenceService extends Service {
     databaseId: string
   ): Promise<boolean> {
     let release: (() => void) | null = null;
-    
+
     try {
       const docRef = this.docsService.open(sourceDocId);
       release = docRef.release;
-      
+
       await docRef.doc.waitForSyncReady();
       const block = docRef.doc.blockSuiteDoc.getBlock(databaseId);
       return block?.flavour === 'affine:database';

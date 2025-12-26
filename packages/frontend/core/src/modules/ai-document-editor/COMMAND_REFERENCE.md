@@ -263,7 +263,7 @@ Reference commands create links to existing databases in other documents.
 ### Complete Reference Example
 
 ```
-"Add a reference to the 'Sprint Tasks' database from the 'Team Planning' document, 
+"Add a reference to the 'Sprint Tasks' database from the 'Team Planning' document,
 showing only the 'Current Sprint' view filtered for my assigned tasks"
 ```
 
@@ -340,12 +340,12 @@ Manipulate existing databases with natural language commands.
 The AI automatically detects your active document and uses it as context:
 
 ```
-"Add a task database"  
+"Add a task database"
 → Creates database in the currently active document
 ```
 
 ```
-"Show the team database here"  
+"Show the team database here"
 → References database in the current document
 ```
 
@@ -393,12 +393,12 @@ Examples:
 When your active document contains databases, the AI includes them in context:
 
 ```
-"Add a row to the task database"  
+"Add a row to the task database"
 → Automatically finds the task database in the current document
 ```
 
 ```
-"Filter the database to show my items"  
+"Filter the database to show my items"
 → Works with databases in the active document
 ```
 
@@ -494,6 +494,7 @@ Use: "Create a project database, add initial projects, and create a kanban view 
 ### Command Not Recognized
 
 If the AI doesn't understand your command:
+
 - Be more specific about what you want to do
 - Use keywords like "create", "add", "edit", "reference"
 - Specify the target document if not using the active one
@@ -501,6 +502,7 @@ If the AI doesn't understand your command:
 ### Database Not Found
 
 If a database reference fails:
+
 - Verify the database exists in the source document
 - Check that you have permission to access the source document
 - Use the exact database name or describe it clearly
@@ -508,6 +510,7 @@ If a database reference fails:
 ### Changes Not Applied
 
 If edits don't appear:
+
 - Check that you approved the preview (if enabled)
 - Verify you have edit permissions for the document
 - Ensure the document is not locked by another user
@@ -515,6 +518,7 @@ If edits don't appear:
 ### Reference Not Updating
 
 If a database reference doesn't show changes:
+
 - Verify the source database still exists
 - Check that the view configuration hasn't been deleted
 - Refresh the document to ensure synchronization
@@ -523,15 +527,15 @@ If a database reference doesn't show changes:
 
 ### Command Patterns
 
-| Pattern | Example |
-|---------|---------|
-| `Edit [target] to [change]` | "Edit the introduction to add context" |
-| `Add [content] [position]` | "Add a heading at the top" |
+| Pattern                              | Example                                           |
+| ------------------------------------ | ------------------------------------------------- |
+| `Edit [target] to [change]`          | "Edit the introduction to add context"            |
+| `Add [content] [position]`           | "Add a heading at the top"                        |
 | `Create [database] with [structure]` | "Create a task database with status and assignee" |
-| `Add reference to [database]` | "Add reference to the team database" |
-| `Update [cell] to [value]` | "Update status to Done" |
-| `Filter [database] by [criteria]` | "Filter tasks by assignee = Alice" |
-| `Create view [name] [type]` | "Create view 'My Tasks' as table" |
+| `Add reference to [database]`        | "Add reference to the team database"              |
+| `Update [cell] to [value]`           | "Update status to Done"                           |
+| `Filter [database] by [criteria]`    | "Filter tasks by assignee = Alice"                |
+| `Create view [name] [type]`          | "Create view 'My Tasks' as table"                 |
 
 ### Position Keywords
 

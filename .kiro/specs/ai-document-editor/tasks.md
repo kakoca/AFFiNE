@@ -28,7 +28,7 @@
     - Register in appropriate extension configuration
     - _Requirements: 11.4_
 
-  - [ ]* 2.4 Write property test for reference creation
+  - [ ]\* 2.4 Write property test for reference creation
     - **Property 10: Database reference points to source**
     - **Validates: Requirements 4.1**
 
@@ -39,7 +39,7 @@
     - Handle context-based document resolution ("this page", "current document")
     - _Requirements: 1.1, 6.1, 6.3_
 
-  - [ ]* 3.2 Write property test for command parsing
+  - [ ]\* 3.2 Write property test for command parsing
     - **Property 1: Command parsing identifies target document**
     - **Validates: Requirements 1.1, 6.1, 6.3**
 
@@ -50,11 +50,11 @@
     - Handle multiple open documents with focus detection via WorkbenchService
     - _Requirements: 6.1, 6.2, 6.4_
 
-  - [ ]* 4.2 Write property test for context management
+  - [ ]\* 4.2 Write property test for context management
     - **Property 18: Active document context includes databases**
     - **Validates: Requirements 6.2**
 
-  - [ ]* 4.3 Write property test for focused editor selection
+  - [ ]\* 4.3 Write property test for focused editor selection
     - **Property 19: Multiple open documents use focused editor**
     - **Validates: Requirements 6.4**
 
@@ -65,7 +65,7 @@
     - Implement preview discard functionality
     - _Requirements: 7.3, 7.4_
 
-  - [ ]* 5.2 Write property test for preview rejection
+  - [ ]\* 5.2 Write property test for preview rejection
     - **Property 20: Preview rejection leaves document unchanged**
     - **Validates: Requirements 7.4**
 
@@ -84,11 +84,11 @@
     - Implement transaction rollback on failure using doc.blockSuiteDoc.transact
     - _Requirements: 1.2, 1.3, 8.1, 9.2_
 
-  - [ ]* 6.3 Write property test for content preservation
+  - [ ]\* 6.3 Write property test for content preservation
     - **Property 2: Edit operations preserve untargeted content**
     - **Validates: Requirements 1.3**
 
-  - [ ]* 6.4 Write property test for operation rollback
+  - [ ]\* 6.4 Write property test for operation rollback
     - **Property 21: Failed operations roll back completely**
     - **Validates: Requirements 8.1**
 
@@ -101,19 +101,19 @@
     - Always call release() when done
     - _Requirements: 2.1, 2.3, 2.4, 2.5, 11.3_
 
-  - [ ]* 6.6 Write property test for content insertion position
+  - [ ]\* 6.6 Write property test for content insertion position
     - **Property 4: Content insertion respects specified position**
     - **Validates: Requirements 2.1**
 
-  - [ ]* 6.7 Write property test for block type support
+  - [ ]\* 6.7 Write property test for block type support
     - **Property 5: All block types can be inserted**
     - **Validates: Requirements 2.3**
 
-  - [ ]* 6.8 Write property test for hierarchy maintenance
+  - [ ]\* 6.8 Write property test for hierarchy maintenance
     - **Property 6: Block hierarchy is maintained after insertion**
     - **Validates: Requirements 2.4**
 
-  - [ ]* 6.9 Write property test for block identifier return
+  - [ ]\* 6.9 Write property test for block identifier return
     - **Property 7: Block insertion returns valid identifier**
     - **Validates: Requirements 2.5**
 
@@ -131,11 +131,11 @@
     - Return database block identifier
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 9.3, 11.2_
 
-  - [ ]* 8.2 Write property test for database creation
+  - [ ]\* 8.2 Write property test for database creation
     - **Property 8: Database creation matches specification**
     - **Validates: Requirements 3.1, 3.2, 3.3, 3.4**
 
-  - [ ]* 8.3 Write property test for database identifier return
+  - [ ]\* 8.3 Write property test for database identifier return
     - **Property 9: Database creation returns valid identifier**
     - **Validates: Requirements 3.5**
 
@@ -154,11 +154,11 @@
     - Return release function to clean up document references
     - _Requirements: 4.3, 5.4_
 
-  - [ ]* 9.3 Write property test for reference synchronization
+  - [ ]\* 9.3 Write property test for reference synchronization
     - **Property 11: Reference modifications update source and all references**
     - **Validates: Requirements 4.3**
 
-  - [ ]* 9.4 Write property test for view reference edits
+  - [ ]\* 9.4 Write property test for view reference edits
     - **Property 16: View reference edits update source**
     - **Validates: Requirements 5.4**
 
@@ -168,15 +168,15 @@
     - Preserve view configuration (filters, sorting) from source
     - _Requirements: 5.1, 5.2, 5.3_
 
-  - [ ]* 9.6 Write property test for view type support
+  - [ ]\* 9.6 Write property test for view type support
     - **Property 12: All view types work through references**
     - **Validates: Requirements 4.4**
 
-  - [ ]* 9.7 Write property test for view-specific display
+  - [ ]\* 9.7 Write property test for view-specific display
     - **Property 14: View-specific references display only specified view**
     - **Validates: Requirements 5.2**
 
-  - [ ]* 9.8 Write property test for view configuration preservation
+  - [ ]\* 9.8 Write property test for view configuration preservation
     - **Property 15: View references preserve configuration**
     - **Validates: Requirements 5.3**
 
@@ -185,11 +185,11 @@
     - Reference remains valid as long as source database exists
     - _Requirements: 4.5_
 
-  - [ ]* 9.10 Write property test for reference stability
+  - [ ]\* 9.10 Write property test for reference stability
     - **Property 13: References remain valid after source moves**
     - **Validates: Requirements 4.5**
 
-  - [ ]* 9.11 Write property test for view config propagation
+  - [ ]\* 9.11 Write property test for view config propagation
     - **Property 17: Source view changes propagate to references**
     - **Validates: Requirements 5.5**
 
@@ -203,7 +203,7 @@
     - Parse row data from natural language commands
     - _Requirements: 10.1, 11.2_
 
-  - [ ]* 11.2 Write property test for row insertion
+  - [ ]\* 11.2 Write property test for row insertion
     - **Property 22: Database row insertion adds rows**
     - **Validates: Requirements 10.1**
 
@@ -212,7 +212,7 @@
     - Parse cell coordinates and values from commands
     - _Requirements: 10.2, 11.2_
 
-  - [ ]* 11.4 Write property test for cell updates
+  - [ ]\* 11.4 Write property test for cell updates
     - **Property 23: Cell updates modify specified cells**
     - **Validates: Requirements 10.2**
 
@@ -221,7 +221,7 @@
     - Apply filters and sorting from commands
     - _Requirements: 10.3, 11.2_
 
-  - [ ]* 11.6 Write property test for view configuration
+  - [ ]\* 11.6 Write property test for view configuration
     - **Property 24: View configuration applies filters and sorting**
     - **Validates: Requirements 10.3**
 
@@ -230,7 +230,7 @@
     - Configure view with specified settings
     - _Requirements: 10.4, 11.2_
 
-  - [ ]* 11.8 Write property test for view creation
+  - [ ]\* 11.8 Write property test for view creation
     - **Property 25: New view creation adds view with settings**
     - **Validates: Requirements 10.4**
 
@@ -240,7 +240,7 @@
     - Verify changes propagate to all clients viewing source or references
     - _Requirements: 1.5, 11.6_
 
-  - [ ]* 12.2 Write property test for multi-session sync
+  - [ ]\* 12.2 Write property test for multi-session sync
     - **Property 3: Multi-session synchronization propagates edits**
     - **Validates: Requirements 1.5**
 

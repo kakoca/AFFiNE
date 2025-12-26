@@ -1,14 +1,14 @@
 /**
  * Example integration of AI Document Editor UI components
- * 
+ *
  * This file demonstrates how to integrate the AICommandInput and ChangePreviewDialog
  * components into an existing AFFiNE page or panel.
- * 
+ *
  * Usage example:
- * 
+ *
  * ```tsx
  * import { AIDocumentEditorPanel } from '@affine/core/modules/ai-document-editor/ui/example-integration';
- * 
+ *
  * // In your component:
  * <AIDocumentEditorPanel />
  * ```
@@ -22,7 +22,7 @@ import { ChangePreviewDialog } from './change-preview-dialog';
 
 /**
  * Example panel that integrates AI command input with change preview
- * 
+ *
  * This demonstrates the complete workflow:
  * 1. User enters a command
  * 2. Command is executed
@@ -101,14 +101,14 @@ export const AIDocumentEditorPanel = () => {
 
 /**
  * Example of integrating the command input into the existing chat panel
- * 
+ *
  * This shows how to extend the EditorChatPanel with document editing capabilities.
- * 
+ *
  * In packages/frontend/core/src/desktop/pages/workspace/detail-page/tabs/chat.tsx:
- * 
+ *
  * ```tsx
  * import { AICommandInput } from '@affine/core/modules/ai-document-editor/ui';
- * 
+ *
  * // Add to the EditorChatPanel component:
  * <div className={styles.commandInputContainer}>
  *   <AICommandInput

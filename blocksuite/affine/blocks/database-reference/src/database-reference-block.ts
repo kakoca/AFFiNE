@@ -1,12 +1,18 @@
+import {
+  DatabaseBlockDataSource,
+  DatabaseSelection,
+} from '@blocksuite/affine-block-database';
 import { CaptionedBlockComponent } from '@blocksuite/affine-components/caption';
 import { toast } from '@blocksuite/affine-components/toast';
-import { DatabaseBlockDataSource, DatabaseSelection } from '@blocksuite/affine-block-database';
-import type { DatabaseBlockModel, DatabaseReferenceBlockModel } from '@blocksuite/affine-model';
+import type {
+  DatabaseBlockModel,
+  DatabaseReferenceBlockModel,
+} from '@blocksuite/affine-model';
 import {
+  DataViewRootUILogic,
   type DataViewSelection,
   type DataViewWidget,
   type DataViewWidgetProps,
-  DataViewRootUILogic,
   defineUniComponent,
   lazy,
   renderUniLit,
@@ -69,14 +75,16 @@ export class DatabaseReferenceBlockComponent extends CaptionedBlockComponent<Dat
   private readonly headerWidget: DataViewWidget = defineUniComponent(
     (props: DataViewWidgetProps) => {
       const sourceInfo = html`
-        <div style=${styleMap({
-          fontSize: '12px',
-          color: 'var(--affine-text-secondary-color)',
-          marginBottom: '8px',
-          padding: '4px 8px',
-          background: 'var(--affine-background-secondary-color)',
-          borderRadius: '4px',
-        })}>
+        <div
+          style=${styleMap({
+            fontSize: '12px',
+            color: 'var(--affine-text-secondary-color)',
+            marginBottom: '8px',
+            padding: '4px 8px',
+            background: 'var(--affine-background-secondary-color)',
+            borderRadius: '4px',
+          })}
+        >
           Referenced Database
         </div>
       `;
@@ -148,7 +156,7 @@ export class DatabaseReferenceBlockComponent extends CaptionedBlockComponent<Dat
       // For now, we only support references within the same document
       // Cross-document references would require integration with the AFFiNE workspace layer
       const currentDoc = this.doc;
-      
+
       if (sourceDocId !== currentDoc.id) {
         this._error = 'Cross-document references are not yet supported';
         this._loading = false;
@@ -157,7 +165,7 @@ export class DatabaseReferenceBlockComponent extends CaptionedBlockComponent<Dat
 
       // Get the source database block from the current document
       const sourceBlock = currentDoc.getBlock(sourceDatabaseId);
-      
+
       if (!sourceBlock || sourceBlock.flavour !== 'affine:database') {
         this._error = 'Source database not found or invalid';
         this._loading = false;
@@ -176,7 +184,8 @@ export class DatabaseReferenceBlockComponent extends CaptionedBlockComponent<Dat
       this.requestUpdate();
     } catch (error) {
       console.error('Failed to load source database:', error);
-      this._error = error instanceof Error ? error.message : 'Failed to load database';
+      this._error =
+        error instanceof Error ? error.message : 'Failed to load database';
       this._loading = false;
     }
   }
@@ -195,11 +204,13 @@ export class DatabaseReferenceBlockComponent extends CaptionedBlockComponent<Dat
     if (this._loading) {
       return html`
         <div class="affine-database-reference-container">
-          <div style=${styleMap({
-            padding: '20px',
-            textAlign: 'center',
-            color: 'var(--affine-text-secondary-color)',
-          })}>
+          <div
+            style=${styleMap({
+              padding: '20px',
+              textAlign: 'center',
+              color: 'var(--affine-text-secondary-color)',
+            })}
+          >
             Loading database...
           </div>
         </div>
@@ -209,13 +220,15 @@ export class DatabaseReferenceBlockComponent extends CaptionedBlockComponent<Dat
     if (this._error) {
       return html`
         <div class="affine-database-reference-container">
-          <div style=${styleMap({
-            padding: '20px',
-            textAlign: 'center',
-            color: 'var(--affine-error-color)',
-            background: 'var(--affine-background-error-color)',
-            borderRadius: '4px',
-          })}>
+          <div
+            style=${styleMap({
+              padding: '20px',
+              textAlign: 'center',
+              color: 'var(--affine-error-color)',
+              background: 'var(--affine-background-error-color)',
+              borderRadius: '4px',
+            })}
+          >
             Error: ${this._error}
           </div>
         </div>
@@ -225,11 +238,13 @@ export class DatabaseReferenceBlockComponent extends CaptionedBlockComponent<Dat
     if (!this._dataSource || !this.dataViewRootLogic.value) {
       return html`
         <div class="affine-database-reference-container">
-          <div style=${styleMap({
-            padding: '20px',
-            textAlign: 'center',
-            color: 'var(--affine-text-secondary-color)',
-          })}>
+          <div
+            style=${styleMap({
+              padding: '20px',
+              textAlign: 'center',
+              color: 'var(--affine-text-secondary-color)',
+            })}
+          >
             No database available
           </div>
         </div>

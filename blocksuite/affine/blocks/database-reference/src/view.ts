@@ -19,7 +19,10 @@ export class DatabaseReferenceViewExtension extends ViewExtensionProvider {
     super.setup(context);
     context.register([
       FlavourExtension('affine:database-reference'),
-      BlockViewExtension('affine:database-reference', literal`affine-database-reference`),
+      BlockViewExtension(
+        'affine:database-reference',
+        literal`affine-database-reference`
+      ),
     ]);
   }
 }

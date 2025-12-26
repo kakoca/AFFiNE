@@ -9,6 +9,7 @@ This directory contains React components for the AI Document Editor feature.
 A text input component for executing AI document editing commands.
 
 **Features:**
+
 - Natural language command input
 - Command execution through AIDocumentEditorService
 - Loading states and error handling
@@ -20,19 +21,20 @@ A text input component for executing AI document editing commands.
 import { AICommandInput } from '@affine/core/modules/ai-document-editor/ui';
 
 <AICommandInput
-  onCommandExecute={(result) => {
+  onCommandExecute={result => {
     if (result.success) {
       console.log('Command executed:', result);
     }
   }}
-  onError={(error) => {
+  onError={error => {
     console.error('Command failed:', error);
   }}
   placeholder="Enter a document editing command..."
-/>
+/>;
 ```
 
 **Props:**
+
 - `onCommandExecute?: (result: CommandResult) => void` - Called when a command is executed
 - `onError?: (error: Error) => void` - Called when an error occurs
 - `placeholder?: string` - Placeholder text for the input
@@ -43,6 +45,7 @@ import { AICommandInput } from '@affine/core/modules/ai-document-editor/ui';
 A modal dialog that displays a preview of proposed document changes.
 
 **Features:**
+
 - Visual diff display (additions, modifications, deletions)
 - Approve/reject/modify actions
 - Integration with ChangePreviewService
@@ -69,10 +72,11 @@ import { ChangePreviewDialog } from '@affine/core/modules/ai-document-editor/ui'
     setIsOpen(false);
   }}
   onClose={() => setIsOpen(false)}
-/>
+/>;
 ```
 
 **Props:**
+
 - `preview: ChangePreview` - The preview object containing the changes
 - `open: boolean` - Whether the dialog is open
 - `onApprove: () => void` - Called when user approves changes
@@ -91,23 +95,23 @@ See `example-integration.tsx` for a complete example of how to use both componen
 To integrate the command input into the existing chat panel:
 
 1. Import the component:
+
 ```tsx
 import { AICommandInput } from '@affine/core/modules/ai-document-editor/ui';
 ```
 
 2. Add it to your chat panel layout:
+
 ```tsx
 <div className={styles.chatPanel}>
   {/* Existing chat content */}
-  
-  <AICommandInput
-    onCommandExecute={handleCommandExecute}
-    onError={handleCommandError}
-  />
+
+  <AICommandInput onCommandExecute={handleCommandExecute} onError={handleCommandError} />
 </div>
 ```
 
 3. Handle command results:
+
 ```tsx
 const handleCommandExecute = (result: CommandResult) => {
   if (result.success && result.preview) {

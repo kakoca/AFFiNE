@@ -63,6 +63,7 @@ The sync engine handles the distribution of Y.js updates across all connected cl
 ### 4. Transaction Atomicity
 
 Y.js transactions ensure that:
+
 - Multiple related changes are applied atomically
 - Concurrent edits from different clients are merged correctly using CRDT algorithms
 - No partial states are visible to other clients
@@ -150,7 +151,7 @@ While unit tests cannot fully test Y.js synchronization (which requires multiple
 
 1. **Code Review**: Verify all database operations use `bsDoc.transact()`
 2. **Integration Tests**: Test with multiple browser tabs/windows connected to the same workspace
-3. **Manual Testing**: 
+3. **Manual Testing**:
    - Open a document with a database in two browser tabs
    - Create a reference to the database in another document
    - Edit the database through the reference in one tab

@@ -51,16 +51,22 @@ describe('AIDocumentEditorService', () => {
         databases: [],
       };
 
-      vi.mocked(mockDocumentContextManager.getActiveDocumentContext!).mockReturnValue(mockContext);
+      vi.mocked(
+        mockDocumentContextManager.getActiveDocumentContext!
+      ).mockReturnValue(mockContext);
 
       const result = service.getActiveDocumentContext();
 
       expect(result).toBe(mockContext);
-      expect(mockDocumentContextManager.getActiveDocumentContext).toHaveBeenCalled();
+      expect(
+        mockDocumentContextManager.getActiveDocumentContext
+      ).toHaveBeenCalled();
     });
 
     it('should return null when no active document', () => {
-      vi.mocked(mockDocumentContextManager.getActiveDocumentContext!).mockReturnValue(null);
+      vi.mocked(
+        mockDocumentContextManager.getActiveDocumentContext!
+      ).mockReturnValue(null);
 
       const result = service.getActiveDocumentContext();
 
@@ -70,7 +76,9 @@ describe('AIDocumentEditorService', () => {
 
   describe('executeCommand', () => {
     it('should return error when no active document context', async () => {
-      vi.mocked(mockDocumentContextManager.getActiveDocumentContext!).mockReturnValue(null);
+      vi.mocked(
+        mockDocumentContextManager.getActiveDocumentContext!
+      ).mockReturnValue(null);
 
       const result = await service.executeCommand('edit this document');
 
@@ -85,7 +93,9 @@ describe('AIDocumentEditorService', () => {
         databases: [],
       };
 
-      vi.mocked(mockDocumentContextManager.getActiveDocumentContext!).mockReturnValue(mockContext);
+      vi.mocked(
+        mockDocumentContextManager.getActiveDocumentContext!
+      ).mockReturnValue(mockContext);
 
       const result = await service.executeCommand('edit this document');
 
@@ -110,7 +120,10 @@ describe('AIDocumentEditorService', () => {
         release: mockRelease,
       });
 
-      const result = await service.editDocument('test-doc-id', 'edit instructions');
+      const result = await service.editDocument(
+        'test-doc-id',
+        'edit instructions'
+      );
 
       expect(mockDocsService.open).toHaveBeenCalledWith('test-doc-id');
       expect(mockDoc.waitForSyncReady).toHaveBeenCalled();
@@ -129,7 +142,10 @@ describe('AIDocumentEditorService', () => {
         release: mockRelease,
       });
 
-      const result = await service.editDocument('test-doc-id', 'edit instructions');
+      const result = await service.editDocument(
+        'test-doc-id',
+        'edit instructions'
+      );
 
       expect(result.success).toBe(false);
       expect(result.error).toBeDefined();
@@ -239,14 +255,14 @@ describe('AIDocumentEditorService', () => {
       const mockViewAdd = vi.fn();
       const mockRowAdd = vi.fn().mockReturnValue('row-id-1');
       const mockCellValueChange = vi.fn();
-      
+
       const mockNoteBlock = {
         id: 'note-block-id',
         model: {
           children: [],
         },
       };
-      
+
       const mockDbModel = {
         props: {
           columns$: {
@@ -257,11 +273,11 @@ describe('AIDocumentEditorService', () => {
           },
         },
       };
-      
+
       const mockDbBlock = {
         model: mockDbModel,
       };
-      
+
       const mockDoc = {
         waitForSyncReady: vi.fn().mockResolvedValue(undefined),
         blockSuiteDoc: {
@@ -288,16 +304,14 @@ describe('AIDocumentEditorService', () => {
 
       // We need to mock the DatabaseBlockDataSource constructor
       // This is tricky in the test, so we'll just verify the basic flow
-      
+
       const config = {
         columns: [
           { name: 'Task', type: 'text' },
           { name: 'Status', type: 'select' },
         ],
         viewType: 'table' as const,
-        initialRows: [
-          { Task: 'Task 1', Status: 'Todo' },
-        ],
+        initialRows: [{ Task: 'Task 1', Status: 'Todo' }],
       };
 
       const dbId = await service.createDatabase('test-doc-id', config);
@@ -309,7 +323,9 @@ describe('AIDocumentEditorService', () => {
         'note-block-id',
         undefined
       );
-      expect(mockDoc.blockSuiteDoc.getBlock).toHaveBeenCalledWith('database-block-id');
+      expect(mockDoc.blockSuiteDoc.getBlock).toHaveBeenCalledWith(
+        'database-block-id'
+      );
       expect(mockRelease).toHaveBeenCalled();
     });
 
@@ -332,9 +348,9 @@ describe('AIDocumentEditorService', () => {
         viewType: 'table' as const,
       };
 
-      await expect(service.createDatabase('test-doc-id', config)).rejects.toThrow(
-        'No note block found'
-      );
+      await expect(
+        service.createDatabase('test-doc-id', config)
+      ).rejects.toThrow('No note block found');
 
       expect(mockRelease).toHaveBeenCalled();
     });
@@ -347,7 +363,7 @@ describe('AIDocumentEditorService', () => {
           children: [],
         },
       };
-      
+
       const mockDoc = {
         waitForSyncReady: vi.fn().mockResolvedValue(undefined),
         blockSuiteDoc: {
@@ -366,9 +382,9 @@ describe('AIDocumentEditorService', () => {
         viewType: 'table' as const,
       };
 
-      await expect(service.createDatabase('test-doc-id', config)).rejects.toThrow(
-        'Failed to create database block'
-      );
+      await expect(
+        service.createDatabase('test-doc-id', config)
+      ).rejects.toThrow('Failed to create database block');
 
       expect(mockRelease).toHaveBeenCalled();
     });
@@ -381,7 +397,7 @@ describe('AIDocumentEditorService', () => {
           children: ['child1', 'child2'],
         },
       };
-      
+
       const mockDbModel = {
         props: {
           columns$: {
@@ -389,11 +405,11 @@ describe('AIDocumentEditorService', () => {
           },
         },
       };
-      
+
       const mockDbBlock = {
         model: mockDbModel,
       };
-      
+
       const mockDoc = {
         waitForSyncReady: vi.fn().mockResolvedValue(undefined),
         blockSuiteDoc: {
@@ -426,7 +442,7 @@ describe('AIDocumentEditorService', () => {
       const mockRelease = vi.fn();
       const mockRowAdd = vi.fn().mockReturnValue('new-row-id');
       const mockCellValueChange = vi.fn();
-      
+
       const mockDbModel = {
         props: {
           columns$: {
@@ -437,12 +453,12 @@ describe('AIDocumentEditorService', () => {
           },
         },
       };
-      
+
       const mockDbBlock = {
         flavour: 'affine:database',
         model: mockDbModel,
       };
-      
+
       const mockDoc = {
         waitForSyncReady: vi.fn().mockResolvedValue(undefined),
         blockSuiteDoc: {
@@ -464,7 +480,9 @@ describe('AIDocumentEditorService', () => {
         { Task: 'New Task', Status: 'Todo' }
       );
 
-      expect(mockDoc.blockSuiteDoc.getBlock).toHaveBeenCalledWith('database-block-id');
+      expect(mockDoc.blockSuiteDoc.getBlock).toHaveBeenCalledWith(
+        'database-block-id'
+      );
       expect(mockRelease).toHaveBeenCalled();
     });
 
@@ -494,7 +512,7 @@ describe('AIDocumentEditorService', () => {
       const mockBlock = {
         flavour: 'affine:paragraph',
       };
-      
+
       const mockDoc = {
         waitForSyncReady: vi.fn().mockResolvedValue(undefined),
         blockSuiteDoc: {
@@ -518,22 +536,20 @@ describe('AIDocumentEditorService', () => {
   describe('updateDatabaseCell', () => {
     it('should update a cell value in a database', async () => {
       const mockRelease = vi.fn();
-      
+
       const mockDbModel = {
         props: {
           columns$: {
-            value: [
-              { id: 'col-1', name: 'Task', type: 'text' },
-            ],
+            value: [{ id: 'col-1', name: 'Task', type: 'text' }],
           },
         },
       };
-      
+
       const mockDbBlock = {
         flavour: 'affine:database',
         model: mockDbModel,
       };
-      
+
       const mockDoc = {
         waitForSyncReady: vi.fn().mockResolvedValue(undefined),
         blockSuiteDoc: {
@@ -554,7 +570,9 @@ describe('AIDocumentEditorService', () => {
         'Updated Task'
       );
 
-      expect(mockDoc.blockSuiteDoc.getBlock).toHaveBeenCalledWith('database-block-id');
+      expect(mockDoc.blockSuiteDoc.getBlock).toHaveBeenCalledWith(
+        'database-block-id'
+      );
       expect(mockRelease).toHaveBeenCalled();
     });
 
@@ -573,7 +591,13 @@ describe('AIDocumentEditorService', () => {
       });
 
       await expect(
-        service.updateDatabaseCell('test-doc-id', 'database-block-id', 'row-id', 'col-1', 'value')
+        service.updateDatabaseCell(
+          'test-doc-id',
+          'database-block-id',
+          'row-id',
+          'col-1',
+          'value'
+        )
       ).rejects.toThrow('Database block not found');
 
       expect(mockRelease).toHaveBeenCalled();
@@ -583,7 +607,7 @@ describe('AIDocumentEditorService', () => {
   describe('updateDatabaseViewConfig', () => {
     it('should update view configuration', async () => {
       const mockRelease = vi.fn();
-      
+
       const mockDbModel = {
         props: {
           columns$: {
@@ -591,12 +615,12 @@ describe('AIDocumentEditorService', () => {
           },
         },
       };
-      
+
       const mockDbBlock = {
         flavour: 'affine:database',
         model: mockDbModel,
       };
-      
+
       const mockDoc = {
         waitForSyncReady: vi.fn().mockResolvedValue(undefined),
         blockSuiteDoc: {
@@ -616,7 +640,9 @@ describe('AIDocumentEditorService', () => {
         { filter: { type: 'status', value: 'active' } }
       );
 
-      expect(mockDoc.blockSuiteDoc.getBlock).toHaveBeenCalledWith('database-block-id');
+      expect(mockDoc.blockSuiteDoc.getBlock).toHaveBeenCalledWith(
+        'database-block-id'
+      );
       expect(mockRelease).toHaveBeenCalled();
     });
 
@@ -635,7 +661,12 @@ describe('AIDocumentEditorService', () => {
       });
 
       await expect(
-        service.updateDatabaseViewConfig('test-doc-id', 'database-block-id', 'view-id', {})
+        service.updateDatabaseViewConfig(
+          'test-doc-id',
+          'database-block-id',
+          'view-id',
+          {}
+        )
       ).rejects.toThrow('Database block not found');
 
       expect(mockRelease).toHaveBeenCalled();
@@ -645,7 +676,7 @@ describe('AIDocumentEditorService', () => {
   describe('addDatabaseView', () => {
     it('should add a new view to a database', async () => {
       const mockRelease = vi.fn();
-      
+
       const mockDbModel = {
         props: {
           columns$: {
@@ -653,12 +684,12 @@ describe('AIDocumentEditorService', () => {
           },
         },
       };
-      
+
       const mockDbBlock = {
         flavour: 'affine:database',
         model: mockDbModel,
       };
-      
+
       const mockDoc = {
         waitForSyncReady: vi.fn().mockResolvedValue(undefined),
         blockSuiteDoc: {
@@ -680,7 +711,9 @@ describe('AIDocumentEditorService', () => {
         { groupBy: 'status' }
       );
 
-      expect(mockDoc.blockSuiteDoc.getBlock).toHaveBeenCalledWith('database-block-id');
+      expect(mockDoc.blockSuiteDoc.getBlock).toHaveBeenCalledWith(
+        'database-block-id'
+      );
       expect(mockRelease).toHaveBeenCalled();
     });
 
@@ -707,7 +740,7 @@ describe('AIDocumentEditorService', () => {
 
     it('should add view without configuration', async () => {
       const mockRelease = vi.fn();
-      
+
       const mockDbModel = {
         props: {
           columns$: {
@@ -715,12 +748,12 @@ describe('AIDocumentEditorService', () => {
           },
         },
       };
-      
+
       const mockDbBlock = {
         flavour: 'affine:database',
         model: mockDbModel,
       };
-      
+
       const mockDoc = {
         waitForSyncReady: vi.fn().mockResolvedValue(undefined),
         blockSuiteDoc: {
@@ -733,9 +766,15 @@ describe('AIDocumentEditorService', () => {
         release: mockRelease,
       });
 
-      await service.addDatabaseView('test-doc-id', 'database-block-id', 'gallery');
+      await service.addDatabaseView(
+        'test-doc-id',
+        'database-block-id',
+        'gallery'
+      );
 
-      expect(mockDoc.blockSuiteDoc.getBlock).toHaveBeenCalledWith('database-block-id');
+      expect(mockDoc.blockSuiteDoc.getBlock).toHaveBeenCalledWith(
+        'database-block-id'
+      );
       expect(mockRelease).toHaveBeenCalled();
     });
   });
@@ -744,26 +783,24 @@ describe('AIDocumentEditorService', () => {
     it('should verify that edits through DatabaseReferenceBlock trigger Y.js updates on source doc', async () => {
       // This test verifies that when a database is edited through a reference,
       // the changes are properly synchronized via Y.js to the source document.
-      
+
       const mockRelease = vi.fn();
       const transactionCallbacks: Array<() => void> = [];
-      
+
       // Mock the source database model with Y.js transaction support
       const mockDbModel = {
         props: {
           columns$: {
-            value: [
-              { id: 'col-1', name: 'Task', type: 'text' },
-            ],
+            value: [{ id: 'col-1', name: 'Task', type: 'text' }],
           },
         },
       };
-      
+
       const mockDbBlock = {
         flavour: 'affine:database',
         model: mockDbModel,
       };
-      
+
       // Mock the BlockSuite document with Y.js transaction tracking
       const mockDoc = {
         waitForSyncReady: vi.fn().mockResolvedValue(undefined),
@@ -805,27 +842,25 @@ describe('AIDocumentEditorService', () => {
       // This test simulates multiple clients viewing the same database
       // (either directly or through references) and verifies that changes
       // made by one client are visible to others via Y.js synchronization.
-      
+
       const mockRelease1 = vi.fn();
       const mockRelease2 = vi.fn();
       const afterTransactionHandlers: Array<(event: any) => void> = [];
-      
+
       // Mock the database model that will be shared across clients
       const mockDbModel = {
         props: {
           columns$: {
-            value: [
-              { id: 'col-1', name: 'Task', type: 'text' },
-            ],
+            value: [{ id: 'col-1', name: 'Task', type: 'text' }],
           },
         },
       };
-      
+
       const mockDbBlock = {
         flavour: 'affine:database',
         model: mockDbModel,
       };
-      
+
       // Client 1: Opens the source document
       const mockDoc1 = {
         waitForSyncReady: vi.fn().mockResolvedValue(undefined),
@@ -885,7 +920,7 @@ describe('AIDocumentEditorService', () => {
         origin: 'client-1',
         changed: new Set(['database-block-id']),
       };
-      
+
       afterTransactionHandlers.forEach(handler => {
         handler(mockTransactionEvent);
       });
@@ -901,9 +936,13 @@ describe('AIDocumentEditorService', () => {
 
       // Verify that both clients interacted with the same underlying model
       // In a real Y.js scenario, they would share the same Y.Doc instance
-      expect(mockDoc1.blockSuiteDoc.getBlock).toHaveBeenCalledWith('database-block-id');
-      expect(mockDoc2.blockSuiteDoc.getBlock).toHaveBeenCalledWith('database-block-id');
-      
+      expect(mockDoc1.blockSuiteDoc.getBlock).toHaveBeenCalledWith(
+        'database-block-id'
+      );
+      expect(mockDoc2.blockSuiteDoc.getBlock).toHaveBeenCalledWith(
+        'database-block-id'
+      );
+
       // Verify cleanup
       expect(mockRelease1).toHaveBeenCalled();
       expect(mockRelease2).toHaveBeenCalled();
@@ -913,10 +952,10 @@ describe('AIDocumentEditorService', () => {
       // This test verifies that DatabaseBlockDataSource operations
       // (which are used by both direct database access and references)
       // properly integrate with Y.js for synchronization.
-      
+
       const mockRelease = vi.fn();
       const transactionLog: string[] = [];
-      
+
       const mockDbModel = {
         props: {
           columns$: {
@@ -927,12 +966,12 @@ describe('AIDocumentEditorService', () => {
           },
         },
       };
-      
+
       const mockDbBlock = {
         flavour: 'affine:database',
         model: mockDbModel,
       };
-      
+
       const mockDoc = {
         waitForSyncReady: vi.fn().mockResolvedValue(undefined),
         blockSuiteDoc: {
@@ -969,9 +1008,13 @@ describe('AIDocumentEditorService', () => {
 
       // Verify that each operation was wrapped in a transaction
       expect(transactionLog.length).toBeGreaterThan(0);
-      expect(transactionLog.filter(log => log === 'transaction-start').length).toBeGreaterThan(0);
-      expect(transactionLog.filter(log => log === 'transaction-end').length).toBeGreaterThan(0);
-      
+      expect(
+        transactionLog.filter(log => log === 'transaction-start').length
+      ).toBeGreaterThan(0);
+      expect(
+        transactionLog.filter(log => log === 'transaction-end').length
+      ).toBeGreaterThan(0);
+
       // Verify cleanup
       expect(mockRelease).toHaveBeenCalled();
     });
@@ -979,24 +1022,22 @@ describe('AIDocumentEditorService', () => {
     it('should handle Y.js synchronization errors gracefully', async () => {
       // This test verifies that if Y.js synchronization fails,
       // the system handles it gracefully without corrupting data.
-      
+
       const mockRelease = vi.fn();
-      
+
       const mockDbModel = {
         props: {
           columns$: {
-            value: [
-              { id: 'col-1', name: 'Task', type: 'text' },
-            ],
+            value: [{ id: 'col-1', name: 'Task', type: 'text' }],
           },
         },
       };
-      
+
       const mockDbBlock = {
         flavour: 'affine:database',
         model: mockDbModel,
       };
-      
+
       const mockDoc = {
         waitForSyncReady: vi.fn().mockResolvedValue(undefined),
         blockSuiteDoc: {

@@ -1,6 +1,6 @@
 /**
  * Retry logic with exponential backoff for network errors
- * 
+ *
  * Requirements: 8.5
  */
 
@@ -47,13 +47,13 @@ const DEFAULT_RETRY_CONFIG: RetryConfig = {
 
 /**
  * Check if an error is a network error that should be retried
- * 
+ *
  * @param error - The error to check
  * @returns True if the error is retryable
  */
 export function isNetworkError(error: Error): boolean {
   const message = error.message.toLowerCase();
-  
+
   // Check for common network error patterns
   return (
     message.includes('network') ||
@@ -71,15 +71,15 @@ export function isNetworkError(error: Error): boolean {
 
 /**
  * Execute an operation with retry logic and exponential backoff
- * 
+ *
  * This function will:
  * 1. Attempt to execute the operation
  * 2. If it fails with a retryable error, wait with exponential backoff
  * 3. Retry up to maxAttempts times
  * 4. Throw the last error if all attempts fail
- * 
+ *
  * Requirements: 8.5
- * 
+ *
  * @param operation - The async operation to execute
  * @param config - Retry configuration (optional)
  * @returns The result of the operation
@@ -134,7 +134,7 @@ export async function withRetry<T>(
 
 /**
  * Sleep for a specified duration
- * 
+ *
  * @param ms - Duration in milliseconds
  * @returns Promise that resolves after the duration
  */
@@ -144,12 +144,12 @@ function sleep(ms: number): Promise<void> {
 
 /**
  * Operation queue for handling operations during network interruptions
- * 
+ *
  * This queue will:
  * 1. Store operations when network is unavailable
  * 2. Automatically retry operations when network is restored
  * 3. Provide status updates for queued operations
- * 
+ *
  * Requirements: 8.5
  */
 export class OperationQueue {
@@ -168,7 +168,7 @@ export class OperationQueue {
 
   /**
    * Add an operation to the queue
-   * 
+   *
    * @param operation - The operation to queue
    * @param metadata - Optional metadata about the operation
    * @returns Promise that resolves when the operation completes

@@ -13,6 +13,7 @@ Task 14 (Implement UI components) has been successfully completed. This document
 **Purpose:** Provides a text input for executing AI document editing commands through natural language.
 
 **Features:**
+
 - Natural language command input
 - Integration with AIDocumentEditorService
 - Loading states during command execution
@@ -21,6 +22,7 @@ Task 14 (Implement UI components) has been successfully completed. This document
 - Disabled state during execution
 
 **Props:**
+
 ```typescript
 interface AICommandInputProps {
   onCommandExecute?: (result: CommandResult) => void;
@@ -31,18 +33,20 @@ interface AICommandInputProps {
 ```
 
 **Requirements Satisfied:**
+
 - ✅ Requirement 11.7: Extend existing chat panel with document editing capabilities
 - ✅ Requirement 11.7: Follow existing component patterns and design system
 
 **Usage Example:**
+
 ```tsx
 <AICommandInput
-  onCommandExecute={(result) => {
+  onCommandExecute={result => {
     if (result.success) {
       console.log('Command executed successfully');
     }
   }}
-  onError={(error) => {
+  onError={error => {
     console.error('Error:', error);
   }}
   placeholder="Enter a document editing command..."
@@ -56,6 +60,7 @@ interface AICommandInputProps {
 **Purpose:** Displays a modal dialog showing a preview of proposed document changes before they are applied.
 
 **Features:**
+
 - Visual diff display with three categories:
   - Additions (green highlight)
   - Modifications (yellow highlight, with before/after comparison)
@@ -67,6 +72,7 @@ interface AICommandInputProps {
 - Automatic preview cleanup on approve/reject
 
 **Props:**
+
 ```typescript
 interface ChangePreviewDialogProps {
   preview: ChangePreview;
@@ -79,12 +85,14 @@ interface ChangePreviewDialogProps {
 ```
 
 **Requirements Satisfied:**
+
 - ✅ Requirement 7.1: Display preview of AI-proposed changes
 - ✅ Requirement 7.2: Highlight additions, deletions, and modifications
 - ✅ Requirement 7.5: Provide approve/reject/modify actions
 - ✅ Requirement 11.7: Use existing dialog components and styling
 
 **Usage Example:**
+
 ```tsx
 <ChangePreviewDialog
   preview={changePreview}
@@ -110,10 +118,12 @@ interface ChangePreviewDialogProps {
 All components use vanilla-extract for CSS-in-JS styling, following AFFiNE's design system:
 
 **Files:**
+
 - `ai-command-input.css.ts` - Styles for the command input component
 - `change-preview-dialog.css.ts` - Styles for the preview dialog component
 
 **Design System Compliance:**
+
 - Uses CSS variables for colors (`var(--affine-primary-color)`, etc.)
 - Consistent spacing (8px, 12px, 16px, 24px)
 - Follows existing typography patterns
@@ -127,6 +137,7 @@ All components use vanilla-extract for CSS-in-JS styling, following AFFiNE's des
 **Location:** `packages/frontend/core/src/modules/ai-document-editor/ui/example-integration.tsx`
 
 Shows how to integrate both components together in a complete workflow:
+
 1. User enters command
 2. Command is executed
 3. Preview is shown (if available)
@@ -142,6 +153,7 @@ The example file also demonstrates how to integrate the command input into the e
 **Location:** `packages/frontend/core/src/modules/ai-document-editor/ui/README.md`
 
 Comprehensive documentation including:
+
 - Component descriptions
 - Usage examples
 - Props documentation
@@ -223,6 +235,7 @@ To integrate these components into AFFiNE:
 ## Conclusion
 
 Task 14 has been successfully completed with two fully functional UI components that:
+
 - Follow AFFiNE's design system and component patterns
 - Integrate seamlessly with existing services
 - Provide a complete user experience for AI document editing

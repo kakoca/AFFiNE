@@ -1,4 +1,4 @@
-litellm        
+litellm
 
 16:02:57 - LiteLLM:INFO: mcp_server_manager.py:1972 - Found 0 MCP servers in database
 
@@ -44,7 +44,7 @@ litellm
 
 Traceback (most recent call last):
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 1887, in async_anthropic_messages_handler
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 1887, in async_anthropic_messages_handler
 
     response = await async_httpx_client.post(
 
@@ -56,23 +56,23 @@ Traceback (most recent call last):
 
     ^
 
-  File "/usr/lib/python3.13/site-packages/litellm/litellm_core_utils/logging_utils.py", line 190, in async_wrapper
+File "/usr/lib/python3.13/site-packages/litellm/litellm_core_utils/logging_utils.py", line 190, in async_wrapper
 
     result = await func(*args, **kwargs)
 
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/http_handler.py", line 449, in post
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/http_handler.py", line 449, in post
 
     raise e
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/http_handler.py", line 405, in post
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/http_handler.py", line 405, in post
 
     response.raise_for_status()
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~^^
 
-  File "/usr/lib/python3.13/site-packages/httpx/_models.py", line 829, in raise_for_status
+File "/usr/lib/python3.13/site-packages/httpx/\_models.py", line 829, in raise_for_status
 
     raise HTTPStatusError(message, request=request, response=self)
 
@@ -80,61 +80,59 @@ httpx.HTTPStatusError: Client error '429 Too Many Requests' for url 'https://bed
 
 For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429⁠
 
-
 During handling of the above exception, another exception occurred:
-
 
 Traceback (most recent call last):
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4284, in async_function_with_fallbacks
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4284, in async_function_with_fallbacks
 
     response = await self.async_function_with_retries(*args, **kwargs)
 
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4489, in async_function_with_retries
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4489, in async_function_with_retries
 
     raise original_exception
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4380, in async_function_with_retries
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4380, in async_function_with_retries
 
     response = await self.make_call(original_function, *args, **kwargs)
 
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4500, in make_call
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4500, in make_call
 
     response = await response
 
                ^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3066, in _ageneric_api_call_with_fallbacks_helper
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3066, in \_ageneric_api_call_with_fallbacks_helper
 
     raise e
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3052, in _ageneric_api_call_with_fallbacks_helper
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3052, in \_ageneric_api_call_with_fallbacks_helper
 
     response = await response  # type: ignore
 
                ^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/utils.py", line 1643, in wrapper_async
+File "/usr/lib/python3.13/site-packages/litellm/utils.py", line 1643, in wrapper_async
 
     raise e
 
-  File "/usr/lib/python3.13/site-packages/litellm/utils.py", line 1489, in wrapper_async
+File "/usr/lib/python3.13/site-packages/litellm/utils.py", line 1489, in wrapper_async
 
     result = await original_function(*args, **kwargs)
 
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/anthropic/experimental_pass_through/messages/handler.py", line 90, in anthropic_messages
+File "/usr/lib/python3.13/site-packages/litellm/llms/anthropic/experimental_pass_through/messages/handler.py", line 90, in anthropic_messages
 
     response = await init_response
 
                ^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 1896, in async_anthropic_messages_handler
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 1896, in async_anthropic_messages_handler
 
     raise self._handle_error(
 
@@ -148,7 +146,7 @@ Traceback (most recent call last):
 
     ^
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 3595, in _handle_error
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 3595, in \_handle_error
 
     raise provider_config.get_error_class(
 
@@ -158,13 +156,11 @@ Traceback (most recent call last):
 
 litellm.llms.base_llm.chat.transformation.BaseLLMException: {"message":"Too many tokens per day, please wait before trying again."}
 
-
 During handling of the above exception, another exception occurred:
-
 
 Traceback (most recent call last):
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 1887, in async_anthropic_messages_handler
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 1887, in async_anthropic_messages_handler
 
     response = await async_httpx_client.post(
 
@@ -176,23 +172,23 @@ Traceback (most recent call last):
 
     ^
 
-  File "/usr/lib/python3.13/site-packages/litellm/litellm_core_utils/logging_utils.py", line 190, in async_wrapper
+File "/usr/lib/python3.13/site-packages/litellm/litellm_core_utils/logging_utils.py", line 190, in async_wrapper
 
     result = await func(*args, **kwargs)
 
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/http_handler.py", line 449, in post
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/http_handler.py", line 449, in post
 
     raise e
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/http_handler.py", line 405, in post
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/http_handler.py", line 405, in post
 
     response.raise_for_status()
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~^^
 
-  File "/usr/lib/python3.13/site-packages/httpx/_models.py", line 829, in raise_for_status
+File "/usr/lib/python3.13/site-packages/httpx/\_models.py", line 829, in raise_for_status
 
     raise HTTPStatusError(message, request=request, response=self)
 
@@ -200,63 +196,61 @@ httpx.HTTPStatusError: Client error '429 Too Many Requests' for url 'https://bed
 
 For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429⁠
 
-
 During handling of the above exception, another exception occurred:
-
 
 Traceback (most recent call last):
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4208, in async_function_with_fallbacks_common_utils raise original_exception
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4208, in async_function_with_fallbacks_common_utils raise original_exception
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4284, in async_function_with_fallbacks
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4284, in async_function_with_fallbacks
 
     response = await self.async_function_with_retries(*args, **kwargs)
 
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4489, in async_function_with_retries
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4489, in async_function_with_retries
 
     raise original_exception
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4380, in async_function_with_retries
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4380, in async_function_with_retries
 
     response = await self.make_call(original_function, *args, **kwargs)
 
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4500, in make_call
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4500, in make_call
 
     response = await response
 
                ^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3066, in _ageneric_api_call_with_fallbacks_helper
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3066, in \_ageneric_api_call_with_fallbacks_helper
 
     raise e
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3052, in _ageneric_api_call_with_fallbacks_helper
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3052, in \_ageneric_api_call_with_fallbacks_helper
 
     response = await response  # type: ignore
 
                ^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/utils.py", line 1643, in wrapper_async
+File "/usr/lib/python3.13/site-packages/litellm/utils.py", line 1643, in wrapper_async
 
     raise e
 
-  File "/usr/lib/python3.13/site-packages/litellm/utils.py", line 1489, in wrapper_async
+File "/usr/lib/python3.13/site-packages/litellm/utils.py", line 1489, in wrapper_async
 
     result = await original_function(*args, **kwargs)
 
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/anthropic/experimental_pass_through/messages/handler.py", line 90, in anthropic_messages
+File "/usr/lib/python3.13/site-packages/litellm/llms/anthropic/experimental_pass_through/messages/handler.py", line 90, in anthropic_messages
 
     response = await init_response
 
                ^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 1896, in async_anthropic_messages_handler
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 1896, in async_anthropic_messages_handler
 
     raise self._handle_error(
 
@@ -270,7 +264,7 @@ Traceback (most recent call last):
 
     ^
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 3595, in _handle_error
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 3595, in \_handle_error
 
     raise provider_config.get_error_class(
 
@@ -280,15 +274,13 @@ Traceback (most recent call last):
 
 litellm.llms.base_llm.chat.transformation.BaseLLMException: {"message":"Too many tokens per day, please wait before trying again."}
 
-
-
 Debug Information:Cooldown Deployments=[]
 
 16:04:51 - LiteLLM Router:ERROR: router.py:4225 - litellm.router.py::async_function_with_fallbacks() - Error occurred while trying to do fallbacks - {"message":"Too many tokens per day, please wait before trying again."}
 
 Traceback (most recent call last):
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 1887, in async_anthropic_messages_handler
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 1887, in async_anthropic_messages_handler
 
     response = await async_httpx_client.post(
 
@@ -300,23 +292,23 @@ Traceback (most recent call last):
 
     ^
 
-  File "/usr/lib/python3.13/site-packages/litellm/litellm_core_utils/logging_utils.py", line 190, in async_wrapper
+File "/usr/lib/python3.13/site-packages/litellm/litellm_core_utils/logging_utils.py", line 190, in async_wrapper
 
     result = await func(*args, **kwargs)
 
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/http_handler.py", line 449, in post
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/http_handler.py", line 449, in post
 
     raise e
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/http_handler.py", line 405, in post
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/http_handler.py", line 405, in post
 
     response.raise_for_status()
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~^^
 
-  File "/usr/lib/python3.13/site-packages/httpx/_models.py", line 829, in raise_for_status
+File "/usr/lib/python3.13/site-packages/httpx/\_models.py", line 829, in raise_for_status
 
     raise HTTPStatusError(message, request=request, response=self)
 
@@ -324,61 +316,59 @@ httpx.HTTPStatusError: Client error '429 Too Many Requests' for url 'https://bed
 
 For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429⁠
 
-
 During handling of the above exception, another exception occurred:
-
 
 Traceback (most recent call last):
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4284, in async_function_with_fallbacks
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4284, in async_function_with_fallbacks
 
     response = await self.async_function_with_retries(*args, **kwargs)
 
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4489, in async_function_with_retries
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4489, in async_function_with_retries
 
     raise original_exception
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4380, in async_function_with_retries
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4380, in async_function_with_retries
 
     response = await self.make_call(original_function, *args, **kwargs)
 
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4500, in make_call
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4500, in make_call
 
     response = await response
 
                ^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3066, in _ageneric_api_call_with_fallbacks_helper
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3066, in \_ageneric_api_call_with_fallbacks_helper
 
     raise e
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3052, in _ageneric_api_call_with_fallbacks_helper
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3052, in \_ageneric_api_call_with_fallbacks_helper
 
     response = await response  # type: ignore
 
                ^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/utils.py", line 1643, in wrapper_async
+File "/usr/lib/python3.13/site-packages/litellm/utils.py", line 1643, in wrapper_async
 
     raise e
 
-  File "/usr/lib/python3.13/site-packages/litellm/utils.py", line 1489, in wrapper_async
+File "/usr/lib/python3.13/site-packages/litellm/utils.py", line 1489, in wrapper_async
 
     result = await original_function(*args, **kwargs)
 
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/anthropic/experimental_pass_through/messages/handler.py", line 90, in anthropic_messages
+File "/usr/lib/python3.13/site-packages/litellm/llms/anthropic/experimental_pass_through/messages/handler.py", line 90, in anthropic_messages
 
     response = await init_response
 
                ^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 1896, in async_anthropic_messages_handler
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 1896, in async_anthropic_messages_handler
 
     raise self._handle_error(
 
@@ -392,7 +382,7 @@ Traceback (most recent call last):
 
     ^
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 3595, in _handle_error
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 3595, in \_handle_error
 
     raise provider_config.get_error_class(
 
@@ -402,13 +392,11 @@ Traceback (most recent call last):
 
 litellm.llms.base_llm.chat.transformation.BaseLLMException: {"message":"Too many tokens per day, please wait before trying again."}
 
-
 During handling of the above exception, another exception occurred:
-
 
 Traceback (most recent call last):
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4217, in async_function_with_fallbacks_common_utils
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4217, in async_function_with_fallbacks_common_utils
 
     response = await run_async_fallback(
 
@@ -420,11 +408,11 @@ Traceback (most recent call last):
 
     ^
 
-  File "/usr/lib/python3.13/site-packages/litellm/router_utils/fallback_event_handlers.py", line 161, in run_async_fallback
+File "/usr/lib/python3.13/site-packages/litellm/router_utils/fallback_event_handlers.py", line 161, in run_async_fallback
 
     raise error_from_fallbacks
 
-  File "/usr/lib/python3.13/site-packages/litellm/router_utils/fallback_event_handlers.py", line 139, in run_async_fallback
+File "/usr/lib/python3.13/site-packages/litellm/router_utils/fallback_event_handlers.py", line 139, in run_async_fallback
 
     response = await litellm_router.async_function_with_fallbacks(
 
@@ -438,7 +426,7 @@ Traceback (most recent call last):
 
     ^
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4292, in async_function_with_fallbacks
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4292, in async_function_with_fallbacks
 
     return await self.async_function_with_fallbacks_common_utils(
 
@@ -450,63 +438,63 @@ Traceback (most recent call last):
 
     ^
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4250, in async_function_with_fallbacks_common_utils
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4250, in async_function_with_fallbacks_common_utils
 
     raise original_exception
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4208, in async_function_with_fallbacks_common_utils
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4208, in async_function_with_fallbacks_common_utils
 
     raise original_exception
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4284, in async_function_with_fallbacks
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4284, in async_function_with_fallbacks
 
     response = await self.async_function_with_retries(*args, **kwargs)
 
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4489, in async_function_with_retries
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4489, in async_function_with_retries
 
     raise original_exception
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4380, in async_function_with_retries
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4380, in async_function_with_retries
 
     response = await self.make_call(original_function, *args, **kwargs)
 
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4500, in make_call
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4500, in make_call
 
     response = await response
 
                ^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3066, in _ageneric_api_call_with_fallbacks_helper
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3066, in \_ageneric_api_call_with_fallbacks_helper
 
     raise e
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3052, in _ageneric_api_call_with_fallbacks_helper
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3052, in \_ageneric_api_call_with_fallbacks_helper
 
     response = await response  # type: ignore
 
                ^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/utils.py", line 1643, in wrapper_async
+File "/usr/lib/python3.13/site-packages/litellm/utils.py", line 1643, in wrapper_async
 
     raise e
 
-  File "/usr/lib/python3.13/site-packages/litellm/utils.py", line 1489, in wrapper_async
+File "/usr/lib/python3.13/site-packages/litellm/utils.py", line 1489, in wrapper_async
 
     result = await original_function(*args, **kwargs)
 
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/anthropic/experimental_pass_through/messages/handler.py", line 90, in anthropic_messages
+File "/usr/lib/python3.13/site-packages/litellm/llms/anthropic/experimental_pass_through/messages/handler.py", line 90, in anthropic_messages
 
     response = await init_response
 
                ^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 1896, in async_anthropic_messages_handler
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 1896, in async_anthropic_messages_handler
 
     raise self._handle_error(
 
@@ -520,7 +508,7 @@ Traceback (most recent call last):
 
     ^
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 3595, in _handle_error
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 3595, in \_handle_error
 
     raise provider_config.get_error_class(
 
@@ -530,8 +518,6 @@ Traceback (most recent call last):
 
 litellm.llms.base_llm.chat.transformation.BaseLLMException: {"message":"Too many tokens per day, please wait before trying again."}
 
-
-
 Debug Information:
 
 Cooldown Deployments=[]
@@ -540,7 +526,7 @@ Cooldown Deployments=[]
 
 Traceback (most recent call last):
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 1887, in async_anthropic_messages_handler
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 1887, in async_anthropic_messages_handler
 
     response = await async_httpx_client.post(
 
@@ -552,23 +538,23 @@ Traceback (most recent call last):
 
     ^
 
-  File "/usr/lib/python3.13/site-packages/litellm/litellm_core_utils/logging_utils.py", line 190, in async_wrapper
+File "/usr/lib/python3.13/site-packages/litellm/litellm_core_utils/logging_utils.py", line 190, in async_wrapper
 
     result = await func(*args, **kwargs)
 
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/http_handler.py", line 449, in post
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/http_handler.py", line 449, in post
 
     raise e
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/http_handler.py", line 405, in post
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/http_handler.py", line 405, in post
 
     response.raise_for_status()
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~^^
 
-  File "/usr/lib/python3.13/site-packages/httpx/_models.py", line 829, in raise_for_status
+File "/usr/lib/python3.13/site-packages/httpx/\_models.py", line 829, in raise_for_status
 
     raise HTTPStatusError(message, request=request, response=self)
 
@@ -576,19 +562,17 @@ httpx.HTTPStatusError: Client error '429 Too Many Requests' for url 'https://bed
 
 For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429⁠
 
-
 During handling of the above exception, another exception occurred:
-
 
 Traceback (most recent call last):
 
-  File "/usr/lib/python3.13/site-packages/litellm/proxy/anthropic_endpoints/endpoints.py", line 153, in anthropic_response
+File "/usr/lib/python3.13/site-packages/litellm/proxy/anthropic_endpoints/endpoints.py", line 153, in anthropic_response
 
     responses = await llm_responses
 
                 ^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3965, in async_wrapper
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3965, in async_wrapper
 
     return await self._ageneric_api_call_with_fallbacks(
 
@@ -600,17 +584,17 @@ Traceback (most recent call last):
 
     ^
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 2954, in _ageneric_api_call_with_fallbacks
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 2954, in \_ageneric_api_call_with_fallbacks
 
     raise e
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 2941, in _ageneric_api_call_with_fallbacks
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 2941, in \_ageneric_api_call_with_fallbacks
 
     response = await self.async_function_with_fallbacks(**kwargs)
 
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4292, in async_function_with_fallbacks
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4292, in async_function_with_fallbacks
 
     return await self.async_function_with_fallbacks_common_utils(
 
@@ -622,59 +606,59 @@ Traceback (most recent call last):
 
     ^
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4250, in async_function_with_fallbacks_common_utils
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4250, in async_function_with_fallbacks_common_utils
 
     raise original_exception
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4284, in async_function_with_fallbacks
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4284, in async_function_with_fallbacks
 
     response = await self.async_function_with_retries(*args, **kwargs)
 
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4489, in async_function_with_retries
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4489, in async_function_with_retries
 
     raise original_exception
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4380, in async_function_with_retries
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4380, in async_function_with_retries
 
     response = await self.make_call(original_function, *args, **kwargs)
 
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4500, in make_call
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4500, in make_call
 
     response = await response
 
                ^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3066, in _ageneric_api_call_with_fallbacks_helper
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3066, in \_ageneric_api_call_with_fallbacks_helper
 
     raise e
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3052, in _ageneric_api_call_with_fallbacks_helper
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3052, in \_ageneric_api_call_with_fallbacks_helper
 
     response = await response  # type: ignore
 
                ^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/utils.py", line 1643, in wrapper_async
+File "/usr/lib/python3.13/site-packages/litellm/utils.py", line 1643, in wrapper_async
 
     raise e
 
-  File "/usr/lib/python3.13/site-packages/litellm/utils.py", line 1489, in wrapper_async
+File "/usr/lib/python3.13/site-packages/litellm/utils.py", line 1489, in wrapper_async
 
     result = await original_function(*args, **kwargs)
 
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/anthropic/experimental_pass_through/messages/handler.py", line 90, in anthropic_messages
+File "/usr/lib/python3.13/site-packages/litellm/llms/anthropic/experimental_pass_through/messages/handler.py", line 90, in anthropic_messages
 
     response = await init_response
 
                ^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 1896, in async_anthropic_messages_handler
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 1896, in async_anthropic_messages_handler
 
     raise self._handle_error(
 
@@ -688,7 +672,7 @@ Traceback (most recent call last):
 
     ^
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 3595, in _handle_error
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 3595, in \_handle_error
 
     raise provider_config.get_error_class(
 
@@ -698,28 +682,21 @@ Traceback (most recent call last):
 
 litellm.llms.base_llm.chat.transformation.BaseLLMException: {"message":"Too many tokens per day, please wait before trying again."}
 
+#------------------------------------------------------------#
+
+#
+
+# 'I get frustrated when the product...'
+
+# https://github.com/BerriAI/litellm/issues/new⁠
+
+#
 
 #------------------------------------------------------------#
 
-#                                                            #
-
-#           'I get frustrated when the product...'            #
-
-#        https://github.com/BerriAI/litellm/issues/new⁠        #
-
-#                                                            #
-
-#------------------------------------------------------------#
-
-
- Thank you for using LiteLLM! - Krrish & Ishaan
-
-
-
+Thank you for using LiteLLM! - Krrish & Ishaan
 
 Give Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new⁠
-
-
 
 LiteLLM: Proxy initialized with Config, Set models:
 
@@ -743,7 +720,7 @@ LiteLLM: Proxy initialized with Config, Set models:
 
     titan-embed-text-v1
 
-INFO:     172.21.0.1:52942 - "POST /v1/messages HTTP/1.1" 429 Too Many Requests
+INFO: 172.21.0.1:52942 - "POST /v1/messages HTTP/1.1" 429 Too Many Requests
 
 16:04:54 - LiteLLM Router:INFO: router.py:3061 - ageneric_api_call_with_fallbacks(model=claude-4-5-haiku) Exception {"message":"Too many tokens per day, please wait before trying again."}
 
@@ -777,7 +754,7 @@ INFO:     172.21.0.1:52942 - "POST /v1/messages HTTP/1.1" 429 Too Many Requests
 
 Traceback (most recent call last):
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 1887, in async_anthropic_messages_handler
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 1887, in async_anthropic_messages_handler
 
     response = await async_httpx_client.post(
 
@@ -789,23 +766,23 @@ Traceback (most recent call last):
 
     ^
 
-  File "/usr/lib/python3.13/site-packages/litellm/litellm_core_utils/logging_utils.py", line 190, in async_wrapper
+File "/usr/lib/python3.13/site-packages/litellm/litellm_core_utils/logging_utils.py", line 190, in async_wrapper
 
     result = await func(*args, **kwargs)
 
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/http_handler.py", line 449, in post
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/http_handler.py", line 449, in post
 
     raise e
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/http_handler.py", line 405, in post
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/http_handler.py", line 405, in post
 
     response.raise_for_status()
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~^^
 
-  File "/usr/lib/python3.13/site-packages/httpx/_models.py", line 829, in raise_for_status
+File "/usr/lib/python3.13/site-packages/httpx/\_models.py", line 829, in raise_for_status
 
     raise HTTPStatusError(message, request=request, response=self)
 
@@ -813,61 +790,59 @@ httpx.HTTPStatusError: Client error '429 Too Many Requests' for url 'https://bed
 
 For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429⁠
 
-
 During handling of the above exception, another exception occurred:
-
 
 Traceback (most recent call last):
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4284, in async_function_with_fallbacks
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4284, in async_function_with_fallbacks
 
     response = await self.async_function_with_retries(*args, **kwargs)
 
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4489, in async_function_with_retries
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4489, in async_function_with_retries
 
     raise original_exception
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4380, in async_function_with_retries
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4380, in async_function_with_retries
 
     response = await self.make_call(original_function, *args, **kwargs)
 
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4500, in make_call
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4500, in make_call
 
     response = await response
 
                ^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3066, in _ageneric_api_call_with_fallbacks_helper
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3066, in \_ageneric_api_call_with_fallbacks_helper
 
     raise e
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3052, in _ageneric_api_call_with_fallbacks_helper
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3052, in \_ageneric_api_call_with_fallbacks_helper
 
     response = await response  # type: ignore
 
                ^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/utils.py", line 1643, in wrapper_async
+File "/usr/lib/python3.13/site-packages/litellm/utils.py", line 1643, in wrapper_async
 
     raise e
 
-  File "/usr/lib/python3.13/site-packages/litellm/utils.py", line 1489, in wrapper_async
+File "/usr/lib/python3.13/site-packages/litellm/utils.py", line 1489, in wrapper_async
 
     result = await original_function(*args, **kwargs)
 
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/anthropic/experimental_pass_through/messages/handler.py", line 90, in anthropic_messages
+File "/usr/lib/python3.13/site-packages/litellm/llms/anthropic/experimental_pass_through/messages/handler.py", line 90, in anthropic_messages
 
     response = await init_response
 
                ^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 1896, in async_anthropic_messages_handler
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 1896, in async_anthropic_messages_handler
 
     raise self._handle_error(
 
@@ -881,7 +856,7 @@ Traceback (most recent call last):
 
     ^
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 3595, in _handle_error
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 3595, in \_handle_error
 
     raise provider_config.get_error_class(
 
@@ -891,13 +866,11 @@ Traceback (most recent call last):
 
 litellm.llms.base_llm.chat.transformation.BaseLLMException: {"message":"Too many tokens per day, please wait before trying again."}
 
-
 During handling of the above exception, another exception occurred:
-
 
 Traceback (most recent call last):
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 1887, in async_anthropic_messages_handler
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 1887, in async_anthropic_messages_handler
 
     response = await async_httpx_client.post(
 
@@ -909,23 +882,23 @@ Traceback (most recent call last):
 
     ^
 
-  File "/usr/lib/python3.13/site-packages/litellm/litellm_core_utils/logging_utils.py", line 190, in async_wrapper
+File "/usr/lib/python3.13/site-packages/litellm/litellm_core_utils/logging_utils.py", line 190, in async_wrapper
 
     result = await func(*args, **kwargs)
 
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/http_handler.py", line 449, in post
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/http_handler.py", line 449, in post
 
     raise e
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/http_handler.py", line 405, in post
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/http_handler.py", line 405, in post
 
     response.raise_for_status()
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~^^
 
-  File "/usr/lib/python3.13/site-packages/httpx/_models.py", line 829, in raise_for_status
+File "/usr/lib/python3.13/site-packages/httpx/\_models.py", line 829, in raise_for_status
 
     raise HTTPStatusError(message, request=request, response=self)
 
@@ -933,65 +906,63 @@ httpx.HTTPStatusError: Client error '429 Too Many Requests' for url 'https://bed
 
 For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429⁠
 
-
 During handling of the above exception, another exception occurred:
-
 
 Traceback (most recent call last):
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4208, in async_function_with_fallbacks_common_utils
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4208, in async_function_with_fallbacks_common_utils
 
     raise original_exception
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4284, in async_function_with_fallbacks
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4284, in async_function_with_fallbacks
 
     response = await self.async_function_with_retries(*args, **kwargs)
 
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4489, in async_function_with_retries
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4489, in async_function_with_retries
 
     raise original_exception
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4380, in async_function_with_retries
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4380, in async_function_with_retries
 
     response = await self.make_call(original_function, *args, **kwargs)
 
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4500, in make_call
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4500, in make_call
 
     response = await response
 
                ^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3066, in _ageneric_api_call_with_fallbacks_helper
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3066, in \_ageneric_api_call_with_fallbacks_helper
 
     raise e
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3052, in _ageneric_api_call_with_fallbacks_helper
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3052, in \_ageneric_api_call_with_fallbacks_helper
 
     response = await response  # type: ignore
 
                ^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/utils.py", line 1643, in wrapper_async
+File "/usr/lib/python3.13/site-packages/litellm/utils.py", line 1643, in wrapper_async
 
     raise e
 
-  File "/usr/lib/python3.13/site-packages/litellm/utils.py", line 1489, in wrapper_async
+File "/usr/lib/python3.13/site-packages/litellm/utils.py", line 1489, in wrapper_async
 
     result = await original_function(*args, **kwargs)
 
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/anthropic/experimental_pass_through/messages/handler.py", line 90, in anthropic_messages
+File "/usr/lib/python3.13/site-packages/litellm/llms/anthropic/experimental_pass_through/messages/handler.py", line 90, in anthropic_messages
 
     response = await init_response
 
                ^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 1896, in async_anthropic_messages_handler
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 1896, in async_anthropic_messages_handler
 
     raise self._handle_error(
 
@@ -1005,7 +976,7 @@ Traceback (most recent call last):
 
     ^
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 3595, in _handle_error
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 3595, in \_handle_error
 
     raise provider_config.get_error_class(
 
@@ -1014,8 +985,6 @@ Traceback (most recent call last):
     )
 
 litellm.llms.base_llm.chat.transformation.BaseLLMException: {"message":"Too many tokens per day, please wait before trying again."}
-
-
 
 Debug Information:
 
@@ -1025,7 +994,7 @@ Cooldown Deployments=[]
 
 Traceback (most recent call last):
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 1887, in async_anthropic_messages_handler
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 1887, in async_anthropic_messages_handler
 
     response = await async_httpx_client.post(
 
@@ -1037,23 +1006,23 @@ Traceback (most recent call last):
 
     ^
 
-  File "/usr/lib/python3.13/site-packages/litellm/litellm_core_utils/logging_utils.py", line 190, in async_wrapper
+File "/usr/lib/python3.13/site-packages/litellm/litellm_core_utils/logging_utils.py", line 190, in async_wrapper
 
     result = await func(*args, **kwargs)
 
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/http_handler.py", line 449, in post
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/http_handler.py", line 449, in post
 
     raise e
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/http_handler.py", line 405, in post
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/http_handler.py", line 405, in post
 
     response.raise_for_status()
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~^^
 
-  File "/usr/lib/python3.13/site-packages/httpx/_models.py", line 829, in raise_for_status
+File "/usr/lib/python3.13/site-packages/httpx/\_models.py", line 829, in raise_for_status
 
     raise HTTPStatusError(message, request=request, response=self)
 
@@ -1061,61 +1030,59 @@ httpx.HTTPStatusError: Client error '429 Too Many Requests' for url 'https://bed
 
 For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429⁠
 
-
 During handling of the above exception, another exception occurred:
-
 
 Traceback (most recent call last):
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4284, in async_function_with_fallbacks
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4284, in async_function_with_fallbacks
 
     response = await self.async_function_with_retries(*args, **kwargs)
 
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4489, in async_function_with_retries
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4489, in async_function_with_retries
 
     raise original_exception
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4380, in async_function_with_retries
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4380, in async_function_with_retries
 
     response = await self.make_call(original_function, *args, **kwargs)
 
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4500, in make_call
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4500, in make_call
 
     response = await response
 
                ^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3066, in _ageneric_api_call_with_fallbacks_helper
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3066, in \_ageneric_api_call_with_fallbacks_helper
 
     raise e
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3052, in _ageneric_api_call_with_fallbacks_helper
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 3052, in \_ageneric_api_call_with_fallbacks_helper
 
     response = await response  # type: ignore
 
                ^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/utils.py", line 1643, in wrapper_async
+File "/usr/lib/python3.13/site-packages/litellm/utils.py", line 1643, in wrapper_async
 
     raise e
 
-  File "/usr/lib/python3.13/site-packages/litellm/utils.py", line 1489, in wrapper_async
+File "/usr/lib/python3.13/site-packages/litellm/utils.py", line 1489, in wrapper_async
 
     result = await original_function(*args, **kwargs)
 
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/anthropic/experimental_pass_through/messages/handler.py", line 90, in anthropic_messages
+File "/usr/lib/python3.13/site-packages/litellm/llms/anthropic/experimental_pass_through/messages/handler.py", line 90, in anthropic_messages
 
     response = await init_response
 
                ^^^^^^^^^^^^^^^^^^^
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 1896, in async_anthropic_messages_handler
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 1896, in async_anthropic_messages_handler
 
     raise self._handle_error(
 
@@ -1129,7 +1096,7 @@ Traceback (most recent call last):
 
     ^
 
-  File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 3595, in _handle_error
+File "/usr/lib/python3.13/site-packages/litellm/llms/custom_httpx/llm_http_handler.py", line 3595, in \_handle_error
 
     raise provider_config.get_error_class(
 
@@ -1139,13 +1106,11 @@ Traceback (most recent call last):
 
 litellm.llms.base_llm.chat.transformation.BaseLLMException: {"message":"Too many tokens per day, please wait before trying again."}
 
-
 During handling of the above exception, another exception occurred:
-
 
 Traceback (most recent call last):
 
-  File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4217, in async_function_with_fallbacks_common_utils
+File "/usr/lib/python3.13/site-packages/litellm/router.py", line 4217, in async_function_with_fallbacks_common_utils
 
     response = await run_async_fallback(
 
@@ -1157,11 +1122,11 @@ Traceback (most recent call last):
 
     ^
 
-  File "/usr/lib/python3.13/site-packages/litellm/router_utils/fallback_event_handlers.py", line 161, in run_async_fallback
+File "/usr/lib/python3.13/site-packages/litellm/router_utils/fallback_event_handlers.py", line 161, in run_async_fallback
 
     raise error_from_fallbacks
 
-  File "/usr/lib/python3.13/site-packages/litellm/router_utils/fallback_event_handlers.py", line 139, in run_async_fallback
+File "/usr/lib/python3.13/site-packages/litellm/router_utils/fallback_event_handlers.py", line 139, in run_async_fallback
 
     response = await litellm_router.async_function_with_fallbacks(
 

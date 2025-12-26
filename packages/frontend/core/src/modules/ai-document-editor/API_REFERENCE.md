@@ -92,6 +92,7 @@ constructor(
 ```
 
 **Parameters:**
+
 - `docsService`: Service for document access and manipulation
 - `workspaceService`: Service for workspace-level operations
 
@@ -109,12 +110,14 @@ async executeCommand(
 ```
 
 **Parameters:**
+
 - `command`: Natural language command string
 - `options`: Optional configuration
   - `preview?: boolean`: Whether to generate a preview before applying
   - `context?: DocumentContext`: Explicit context (overrides auto-detection)
 
 **Returns:** `Promise<CommandResult>`
+
 - `success: boolean`: Whether the command executed successfully
 - `operations: DocumentOperation[]`: List of operations performed
 - `affectedBlocks: string[]`: IDs of blocks that were modified
@@ -124,10 +127,7 @@ async executeCommand(
 **Example:**
 
 ```typescript
-const result = await aiDocService.executeCommand(
-  "Add a task database with status and assignee columns",
-  { preview: true }
-);
+const result = await aiDocService.executeCommand('Add a task database with status and assignee columns', { preview: true });
 
 if (result.success && result.preview) {
   // Show preview to user
@@ -148,11 +148,13 @@ async editDocument(
 ```
 
 **Parameters:**
+
 - `docId`: Target document identifier
 - `instructions`: Natural language editing instructions
 - `preview`: Whether to generate a preview (default: false)
 
 **Returns:** `Promise<EditResult>`
+
 - `success: boolean`: Whether the edit succeeded
 - `changes: DocumentOperation[]`: List of changes made
 - `preview?: ChangePreview`: Preview object if requested
@@ -160,11 +162,7 @@ async editDocument(
 **Example:**
 
 ```typescript
-const result = await aiDocService.editDocument(
-  'doc-123',
-  'Update the introduction to emphasize security',
-  true
-);
+const result = await aiDocService.editDocument('doc-123', 'Update the introduction to emphasize security', true);
 ```
 
 ##### addContent
@@ -180,6 +178,7 @@ async addContent(
 ```
 
 **Parameters:**
+
 - `docId`: Target document identifier
 - `content`: Content to add
   - `type: string`: Block type (e.g., 'affine:paragraph', 'affine:list')
@@ -197,7 +196,7 @@ const blockId = await aiDocService.addContent(
   'doc-123',
   {
     type: 'affine:paragraph',
-    props: { text: 'New paragraph content' }
+    props: { text: 'New paragraph content' },
   },
   { position: 'after', id: 'existing-block-id' }
 );
@@ -216,6 +215,7 @@ async createDatabase(
 ```
 
 **Parameters:**
+
 - `docId`: Target document identifier
 - `config`: Database configuration
   - `name?: string`: Database name
@@ -229,21 +229,16 @@ async createDatabase(
 **Example:**
 
 ```typescript
-const dbId = await aiDocService.createDatabase(
-  'doc-123',
-  {
-    name: 'Task Tracker',
-    columns: [
-      { name: 'Title', type: 'title' },
-      { name: 'Status', type: 'select', data: { options: ['Todo', 'Done'] } },
-      { name: 'Assignee', type: 'text' }
-    ],
-    viewType: 'table',
-    initialRows: [
-      { Title: 'First task', Status: 'Todo', Assignee: 'Alice' }
-    ]
-  }
-);
+const dbId = await aiDocService.createDatabase('doc-123', {
+  name: 'Task Tracker',
+  columns: [
+    { name: 'Title', type: 'title' },
+    { name: 'Status', type: 'select', data: { options: ['Todo', 'Done'] } },
+    { name: 'Assignee', type: 'text' },
+  ],
+  viewType: 'table',
+  initialRows: [{ Title: 'First task', Status: 'Todo', Assignee: 'Alice' }],
+});
 ```
 
 ##### getActiveDocumentContext
@@ -255,6 +250,7 @@ getActiveDocumentContext(): DocumentContext | null
 ```
 
 **Returns:** `DocumentContext | null`
+
 - `docId: string`: Document identifier
 - `doc: Doc`: Document instance
 - `databases: DatabaseInfo[]`: Databases in the document
@@ -298,6 +294,7 @@ async createReference(
 ```
 
 **Parameters:**
+
 - `targetDocId`: Document where reference will be created
 - `sourceDocId`: Document containing the source database
 - `sourceDatabaseId`: ID of the source database block
@@ -307,6 +304,7 @@ async createReference(
 **Returns:** `Promise<string>` - ID of the created reference block
 
 **Throws:**
+
 - `DatabaseReferenceError`: If source database doesn't exist
 
 **Example:**
@@ -335,10 +333,12 @@ async getDataSourceForReference(
 ```
 
 **Parameters:**
+
 - `referenceDocId`: Document containing the reference
 - `referenceBlockId`: ID of the reference block
 
 **Returns:** Object with:
+
 - `dataSource`: DatabaseBlockDataSource for the source database
 - `release`: Function to call when done (releases document references)
 
@@ -347,10 +347,7 @@ async getDataSourceForReference(
 **Example:**
 
 ```typescript
-const { dataSource, release } = await dbRefService.getDataSourceForReference(
-  'doc-123',
-  'ref-block-456'
-);
+const { dataSource, release } = await dbRefService.getDataSourceForReference('doc-123', 'ref-block-456');
 
 try {
   // Manipulate data
@@ -373,10 +370,12 @@ async findReferences(
 ```
 
 **Parameters:**
+
 - `sourceDocId`: Document containing the source database
 - `databaseId`: ID of the database block
 
 **Returns:** `Promise<DatabaseReference[]>` - Array of references
+
 - `id: string`: Reference block ID
 - `sourceId: string`: Source database ID
 - `targetDocId: string`: Document containing the reference
@@ -386,10 +385,7 @@ async findReferences(
 **Example:**
 
 ```typescript
-const references = await dbRefService.findReferences(
-  'source-doc-123',
-  'database-456'
-);
+const references = await dbRefService.findReferences('source-doc-123', 'database-456');
 
 console.log(`Found ${references.length} references`);
 references.forEach(ref => {
@@ -409,6 +405,7 @@ async validateReference(
 ```
 
 **Parameters:**
+
 - `sourceDocId`: Document that should contain the database
 - `databaseId`: ID of the database block
 
@@ -417,10 +414,7 @@ async validateReference(
 **Example:**
 
 ```typescript
-const isValid = await dbRefService.validateReference(
-  'doc-123',
-  'database-456'
-);
+const isValid = await dbRefService.validateReference('doc-123', 'database-456');
 
 if (!isValid) {
   console.error('Database reference target no longer exists');
@@ -445,10 +439,12 @@ async generatePreview(
 ```
 
 **Parameters:**
+
 - `docId`: Target document identifier
 - `operations`: List of operations to preview
 
 **Returns:** `Promise<ChangePreview>`
+
 - `id: string`: Preview identifier
 - `docId: string`: Target document
 - `operations: DocumentOperation[]`: Operations to apply
@@ -460,10 +456,7 @@ async generatePreview(
 **Example:**
 
 ```typescript
-const preview = await changePreviewService.generatePreview(
-  'doc-123',
-  operations
-);
+const preview = await changePreviewService.generatePreview('doc-123', operations);
 
 // Show preview to user
 displayPreview(preview);
@@ -481,10 +474,12 @@ async applyChanges(
 ```
 
 **Parameters:**
+
 - `docId`: Target document identifier
 - `preview`: Preview object to apply
 
 **Throws:**
+
 - `DocumentEditError`: If changes cannot be applied
 
 **Example:**
@@ -503,6 +498,7 @@ async discardPreview(previewId: string): Promise<void>
 ```
 
 **Parameters:**
+
 - `previewId`: Preview identifier to discard
 
 **Example:**
@@ -537,6 +533,7 @@ async enrichContext(doc: Doc): Promise<DocumentContext>
 ```
 
 **Parameters:**
+
 - `doc`: Document to enrich
 
 **Returns:** `Promise<DocumentContext>` - Enriched context with database info
@@ -581,10 +578,12 @@ static parse(
 ```
 
 **Parameters:**
+
 - `command`: Natural language command
 - `context`: Current document context
 
 **Returns:** `ParsedCommand`
+
 - `type: CommandType`: Command type ('edit' | 'add' | 'create' | 'reference')
 - `targetDocId: string`: Target document ID
 - `action: string`: Specific action to perform
@@ -593,10 +592,7 @@ static parse(
 **Example:**
 
 ```typescript
-const parsed = CommandParser.parse(
-  "Add a task database with status column",
-  context
-);
+const parsed = CommandParser.parse('Add a task database with status column', context);
 
 console.log(parsed.type); // 'create'
 console.log(parsed.action); // 'database'
@@ -611,6 +607,7 @@ static getCommandType(command: string): CommandType
 ```
 
 **Parameters:**
+
 - `command`: Command string
 
 **Returns:** `CommandType` - 'edit' | 'add' | 'create' | 'reference'
@@ -627,6 +624,7 @@ static extractTargetDocument(
 ```
 
 **Parameters:**
+
 - `command`: Command string
 - `context`: Current context
 
@@ -638,8 +636,8 @@ static extractTargetDocument(
 
 ```typescript
 interface BlockContent {
-  type: string;  // Block flavour (e.g., 'affine:paragraph')
-  props: Record<string, any>;  // Block properties
+  type: string; // Block flavour (e.g., 'affine:paragraph')
+  props: Record<string, any>; // Block properties
 }
 ```
 
@@ -655,8 +653,8 @@ interface DatabaseConfig {
 
 interface ColumnConfig {
   name: string;
-  type: string;  // 'title' | 'text' | 'number' | 'select' | 'date' | etc.
-  data?: Record<string, any>;  // Type-specific configuration
+  type: string; // 'title' | 'text' | 'number' | 'select' | 'date' | etc.
+  data?: Record<string, any>; // Type-specific configuration
 }
 
 interface RowData {
@@ -667,11 +665,7 @@ interface RowData {
 ### DocumentOperation
 
 ```typescript
-type DocumentOperation =
-  | EditOperation
-  | InsertOperation
-  | DeleteOperation
-  | DatabaseOperation;
+type DocumentOperation = EditOperation | InsertOperation | DeleteOperation | DatabaseOperation;
 
 interface EditOperation {
   type: 'edit';
@@ -703,10 +697,7 @@ interface DatabaseOperation {
 ### InsertToPosition
 
 ```typescript
-type InsertToPosition = 
-  | 'before'
-  | 'after'
-  | { position: 'before' | 'after'; id: string };
+type InsertToPosition = 'before' | 'after' | { position: 'before' | 'after'; id: string };
 ```
 
 ### DocumentContext
@@ -811,7 +802,7 @@ All document operations use transactions that automatically rollback on failure:
 const { doc, release } = docsService.open(docId);
 try {
   await doc.waitForSyncReady();
-  
+
   doc.blockSuiteDoc.transact(() => {
     // All operations here are atomic
     doc.blockSuiteDoc.addBlock(...);
@@ -832,14 +823,11 @@ Network operations include automatic retry with exponential backoff:
 ```typescript
 import { retryWithBackoff } from './retry-logic';
 
-const result = await retryWithBackoff(
-  () => copilotClient.someOperation(),
-  {
-    maxRetries: 3,
-    initialDelay: 1000,
-    maxDelay: 10000
-  }
-);
+const result = await retryWithBackoff(() => copilotClient.someOperation(), {
+  maxRetries: 3,
+  initialDelay: 1000,
+  maxDelay: 10000,
+});
 ```
 
 ## Extension Points
@@ -867,15 +855,12 @@ class CustomCommandParser extends CommandParser {
 Add support for custom block types in content addition:
 
 ```typescript
-await aiDocService.addContent(
-  docId,
-  {
-    type: 'my-custom:block',
-    props: {
-      customProp: 'value'
-    }
-  }
-);
+await aiDocService.addContent(docId, {
+  type: 'my-custom:block',
+  props: {
+    customProp: 'value',
+  },
+});
 ```
 
 ### Custom Database Operations
@@ -884,24 +869,16 @@ Extend database operations with custom logic:
 
 ```typescript
 class ExtendedDatabaseReferenceService extends DatabaseReferenceService {
-  async createReferenceWithCustomLogic(
-    targetDocId: string,
-    sourceDocId: string,
-    sourceDatabaseId: string
-  ): Promise<string> {
+  async createReferenceWithCustomLogic(targetDocId: string, sourceDocId: string, sourceDatabaseId: string): Promise<string> {
     // Custom pre-processing
     await this.validateCustomRules(sourceDocId, sourceDatabaseId);
-    
+
     // Call parent implementation
-    const refId = await super.createReference(
-      targetDocId,
-      sourceDocId,
-      sourceDatabaseId
-    );
-    
+    const refId = await super.createReference(targetDocId, sourceDocId, sourceDatabaseId);
+
     // Custom post-processing
     await this.notifyCustomListeners(refId);
-    
+
     return refId;
   }
 }
@@ -940,31 +917,29 @@ class MyExtension {
     // Hook into operations
     this.setupHooks();
   }
-  
+
   private setupHooks() {
     // Override methods to add hooks
-    const originalExecuteCommand = this.aiDocService.executeCommand.bind(
-      this.aiDocService
-    );
-    
+    const originalExecuteCommand = this.aiDocService.executeCommand.bind(this.aiDocService);
+
     this.aiDocService.executeCommand = async (command, options) => {
       // Pre-execution hook
       await this.onBeforeCommand(command);
-      
+
       // Execute
       const result = await originalExecuteCommand(command, options);
-      
+
       // Post-execution hook
       await this.onAfterCommand(command, result);
-      
+
       return result;
     };
   }
-  
+
   private async onBeforeCommand(command: string) {
     console.log(`Executing command: ${command}`);
   }
-  
+
   private async onAfterCommand(command: string, result: CommandResult) {
     console.log(`Command completed: ${result.success}`);
   }

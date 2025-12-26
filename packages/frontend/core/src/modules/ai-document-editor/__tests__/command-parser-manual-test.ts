@@ -20,30 +20,51 @@ console.log('Test 1: Edit command with "this page"');
 const result1 = CommandParser.parse('Edit this page', mockContext);
 console.log('Result:', result1);
 console.log('✓ Type:', result1.type === CommandType.Edit ? 'PASS' : 'FAIL');
-console.log('✓ Target:', result1.targetDocId === 'test-doc-123' ? 'PASS' : 'FAIL');
+console.log(
+  '✓ Target:',
+  result1.targetDocId === 'test-doc-123' ? 'PASS' : 'FAIL'
+);
 console.log();
 
 // Test 2: Add command
 console.log('Test 2: Add command');
-const result2 = CommandParser.parse('Add a paragraph to current document', mockContext);
+const result2 = CommandParser.parse(
+  'Add a paragraph to current document',
+  mockContext
+);
 console.log('Result:', result2);
 console.log('✓ Type:', result2.type === CommandType.Add ? 'PASS' : 'FAIL');
-console.log('✓ Target:', result2.targetDocId === 'test-doc-123' ? 'PASS' : 'FAIL');
+console.log(
+  '✓ Target:',
+  result2.targetDocId === 'test-doc-123' ? 'PASS' : 'FAIL'
+);
 console.log();
 
 // Test 3: Create database command
 console.log('Test 3: Create database command');
-const result3 = CommandParser.parse('Create a new kanban database', mockContext);
+const result3 = CommandParser.parse(
+  'Create a new kanban database',
+  mockContext
+);
 console.log('Result:', result3);
 console.log('✓ Type:', result3.type === CommandType.Create ? 'PASS' : 'FAIL');
-console.log('✓ ViewType:', result3.parameters?.viewType === 'kanban' ? 'PASS' : 'FAIL');
+console.log(
+  '✓ ViewType:',
+  result3.parameters?.viewType === 'kanban' ? 'PASS' : 'FAIL'
+);
 console.log();
 
 // Test 4: Reference command
 console.log('Test 4: Reference command');
-const result4 = CommandParser.parse('Reference the database from another page', mockContext);
+const result4 = CommandParser.parse(
+  'Reference the database from another page',
+  mockContext
+);
 console.log('Result:', result4);
-console.log('✓ Type:', result4.type === CommandType.Reference ? 'PASS' : 'FAIL');
+console.log(
+  '✓ Type:',
+  result4.type === CommandType.Reference ? 'PASS' : 'FAIL'
+);
 console.log();
 
 // Test 5: Explicit document reference
@@ -55,16 +76,25 @@ console.log();
 
 // Test 6: Position parameters
 console.log('Test 6: Position parameters');
-const result6 = CommandParser.parse('Add content at the beginning', mockContext);
+const result6 = CommandParser.parse(
+  'Add content at the beginning',
+  mockContext
+);
 console.log('Result:', result6);
-console.log('✓ Position:', result6.parameters?.position === 'start' ? 'PASS' : 'FAIL');
+console.log(
+  '✓ Position:',
+  result6.parameters?.position === 'start' ? 'PASS' : 'FAIL'
+);
 console.log();
 
 // Test 7: Database operation
 console.log('Test 7: Database operation');
 const result7 = CommandParser.parse('Add a row to the database', mockContext);
 console.log('Result:', result7);
-console.log('✓ Type:', result7.type === CommandType.DatabaseOperation ? 'PASS' : 'FAIL');
+console.log(
+  '✓ Type:',
+  result7.type === CommandType.DatabaseOperation ? 'PASS' : 'FAIL'
+);
 console.log();
 
 // Test 8: Error handling - empty command

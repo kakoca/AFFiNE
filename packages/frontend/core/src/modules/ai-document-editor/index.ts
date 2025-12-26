@@ -11,15 +11,15 @@ import { DocumentContextManager } from './services/document-context-manager';
 
 /**
  * Configure the AI Document Editor module
- * 
+ *
  * This module provides AI-driven document editing capabilities including:
  * - Direct document editing through chat commands
  * - Database block creation and manipulation
  * - Cross-document database references
  * - Change preview and approval workflows
- * 
+ *
  * Requirements: 11.9
- * 
+ *
  * @param framework - The framework instance to configure
  */
 export function configureAIDocumentEditorModule(framework: Framework) {

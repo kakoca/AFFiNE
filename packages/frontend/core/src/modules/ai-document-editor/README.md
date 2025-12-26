@@ -37,10 +37,12 @@ The `DocumentContextManager` service tracks the currently active document and en
 - **Multi-Document Support**: Handles multiple open documents by using the focused editor from WorkbenchService
 
 **Key Methods**:
+
 - `getActiveDocumentContext()`: Returns the current active document context synchronously
 - `activeDocumentContext$`: Observable that emits context updates when the active view changes
 
 **Context Information**:
+
 - Document ID
 - List of databases in the document (with block IDs, names, and views)
 - Cursor position (future)
@@ -55,6 +57,7 @@ The `CommandParser` utility parses natural language commands into structured ope
 - **Context Resolution**: Handles "this page" and "current document" references
 
 **Requirements Validated**:
+
 - 6.1: Automatic detection of currently active document
 - 6.2: Context enrichment with database information
 - 6.4: Multiple open documents handled via focused editor
@@ -70,17 +73,20 @@ The `ChangePreviewService` handles preview generation and application of documen
 - **Preview Discard**: Allows rejecting changes without affecting the original document
 
 **Key Methods**:
+
 - `generatePreview(docId, operations)`: Generates a preview of proposed changes
 - `applyChanges(docId, preview)`: Applies approved changes using transactions
 - `discardPreview(previewId)`: Discards a preview without applying changes
 - `getPreview(previewId)`: Retrieves a stored preview by ID
 
 **Preview Structure**:
+
 - Additions: New blocks to be inserted
 - Modifications: Existing blocks with before/after states
 - Deletions: Blocks to be removed with their current state
 
 **Requirements Validated**:
+
 - 7.3: Apply changes to the document with transaction support
 - 7.4: Discard proposed changes and maintain current document state
 - 8.1: Roll back partial changes on failure to maintain consistency
@@ -141,14 +147,14 @@ import { AIDocumentEditorService } from '@affine/core/modules/ai-document-editor
 
 function MyComponent() {
   const aiDocService = useService(AIDocumentEditorService);
-  
+
   const handleCommand = async (command: string) => {
     const result = await aiDocService.executeCommand(command);
     if (result.success) {
       console.log('Command executed successfully');
     }
   };
-  
+
   return <CommandInput onSubmit={handleCommand} />;
 }
 ```

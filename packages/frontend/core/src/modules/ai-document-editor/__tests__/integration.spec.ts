@@ -1,10 +1,10 @@
 /**
  * Integration and End-to-End Tests for AI Document Editor
- * 
+ *
  * These tests verify complete workflows and interactions between components.
  * Task 17: Integration and end-to-end testing
  * Requirements: All
- * 
+ *
  * @vitest-environment happy-dom
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
@@ -54,9 +54,7 @@ describe('Integration Tests: AI Document Editor', () => {
       contextManager
     );
 
-    dbRefService = new DatabaseReferenceService(
-      mockDocsService as DocsService
-    );
+    dbRefService = new DatabaseReferenceService(mockDocsService as DocsService);
 
     previewService = new ChangePreviewService();
   });
@@ -71,14 +69,18 @@ describe('Integration Tests: AI Document Editor', () => {
         // Setup: Create a mock document with content
         const mockRelease = vi.fn();
         const mockBlocks = [
-          { id: 'block-1', flavour: 'affine:paragraph', model: { text: 'Original text' } },
+          {
+            id: 'block-1',
+            flavour: 'affine:paragraph',
+            model: { text: 'Original text' },
+          },
         ];
         const mockDoc = {
           waitForSyncReady: vi.fn().mockResolvedValue(undefined),
           blockSuiteDoc: {
-            getBlocksByFlavour: vi.fn().mockReturnValue([
-              { id: 'note-1', children: mockBlocks }
-            ]),
+            getBlocksByFlavour: vi
+              .fn()
+              .mockReturnValue([{ id: 'note-1', children: mockBlocks }]),
             getBlock: vi.fn((id: string) => mockBlocks.find(b => b.id === id)),
             transact: vi.fn((fn: () => void) => fn()),
           },
@@ -145,7 +147,7 @@ describe('Integration Tests: AI Document Editor', () => {
           id: 'note-1',
           model: { children: [] },
         };
-        
+
         const mockDbModel = {
           props: {
             columns$: {
@@ -156,12 +158,12 @@ describe('Integration Tests: AI Document Editor', () => {
             },
           },
         };
-        
+
         const mockDbBlock = {
           flavour: 'affine:database',
           model: mockDbModel,
         };
-        
+
         const mockDoc = {
           waitForSyncReady: vi.fn().mockResolvedValue(undefined),
           blockSuiteDoc: {
@@ -209,18 +211,16 @@ describe('Integration Tests: AI Document Editor', () => {
         const mockDbModel = {
           props: {
             columns$: {
-              value: [
-                { id: 'col-1', name: 'Task', type: 'text' },
-              ],
+              value: [{ id: 'col-1', name: 'Task', type: 'text' }],
             },
           },
         };
-        
+
         const mockDbBlock = {
           flavour: 'affine:database',
           model: mockDbModel,
         };
-        
+
         const mockDoc = {
           waitForSyncReady: vi.fn().mockResolvedValue(undefined),
           blockSuiteDoc: {
@@ -268,7 +268,7 @@ describe('Integration Tests: AI Document Editor', () => {
             },
           },
         };
-        
+
         const mockSourceDoc = {
           waitForSyncReady: vi.fn().mockResolvedValue(undefined),
           blockSuiteDoc: {
@@ -282,7 +282,7 @@ describe('Integration Tests: AI Document Editor', () => {
           id: 'target-note-1',
           model: { children: [] },
         };
-        
+
         const mockTargetDoc = {
           waitForSyncReady: vi.fn().mockResolvedValue(undefined),
           blockSuiteDoc: {
@@ -338,7 +338,7 @@ describe('Integration Tests: AI Document Editor', () => {
             },
           },
         };
-        
+
         const mockSourceDoc = {
           waitForSyncReady: vi.fn().mockResolvedValue(undefined),
           blockSuiteDoc: {
@@ -351,7 +351,7 @@ describe('Integration Tests: AI Document Editor', () => {
           id: 'target-note-1',
           model: { children: [] },
         };
-        
+
         const mockTargetDoc = {
           waitForSyncReady: vi.fn().mockResolvedValue(undefined),
           blockSuiteDoc: {
@@ -400,13 +400,11 @@ describe('Integration Tests: AI Document Editor', () => {
         const sharedDbModel = {
           props: {
             columns$: {
-              value: [
-                { id: 'col-1', name: 'Task', type: 'text' },
-              ],
+              value: [{ id: 'col-1', name: 'Task', type: 'text' }],
             },
           },
         };
-        
+
         const mockDbBlock = {
           flavour: 'affine:database',
           model: sharedDbModel,
@@ -470,11 +468,11 @@ describe('Integration Tests: AI Document Editor', () => {
         // Verify: Both transactions were executed
         expect(transactionLog).toContain('user1-transaction');
         expect(transactionLog).toContain('user2-transaction');
-        
+
         // Verify: Both users accessed the same model
         expect(mockDoc1.blockSuiteDoc.getBlock).toHaveBeenCalledWith('db-1');
         expect(mockDoc2.blockSuiteDoc.getBlock).toHaveBeenCalledWith('db-1');
-        
+
         // Verify: Cleanup
         expect(mockRelease1).toHaveBeenCalled();
         expect(mockRelease2).toHaveBeenCalled();
@@ -486,13 +484,11 @@ describe('Integration Tests: AI Document Editor', () => {
         const sharedDbModel = {
           props: {
             columns$: {
-              value: [
-                { id: 'col-1', name: 'Task', type: 'text' },
-              ],
+              value: [{ id: 'col-1', name: 'Task', type: 'text' }],
             },
           },
         };
-        
+
         const mockDbBlock = {
           flavour: 'affine:database',
           model: sharedDbModel,
@@ -547,14 +543,14 @@ describe('Integration Tests: AI Document Editor', () => {
           origin: 'session-1',
           changed: new Set(['db-1']),
         };
-        
+
         afterTransactionHandlers.forEach(handler => {
           handler(mockTransactionEvent);
         });
 
         // Verify: Transaction was executed
         expect(mockDoc1.blockSuiteDoc.transact).toHaveBeenCalled();
-        
+
         // Verify: Cleanup
         expect(mockRelease1).toHaveBeenCalled();
       });
@@ -566,13 +562,11 @@ describe('Integration Tests: AI Document Editor', () => {
         const sharedDbModel = {
           props: {
             columns$: {
-              value: [
-                { id: 'col-1', name: 'Task', type: 'text' },
-              ],
+              value: [{ id: 'col-1', name: 'Task', type: 'text' }],
             },
           },
         };
-        
+
         const mockSourceDbBlock = {
           flavour: 'affine:database',
           model: sharedDbModel,
@@ -621,15 +615,15 @@ describe('Integration Tests: AI Document Editor', () => {
             release: mockSourceRelease,
           });
 
-        const { dataSource, release } = await dbRefService.getDataSourceForReference(
-          'ref-doc-id',
-          'ref-1'
-        );
+        const { dataSource, release } =
+          await dbRefService.getDataSourceForReference('ref-doc-id', 'ref-1');
 
         // Verify: DataSource is connected to source database
-        expect(mockSourceDoc.blockSuiteDoc.getBlock).toHaveBeenCalledWith('source-db-id');
+        expect(mockSourceDoc.blockSuiteDoc.getBlock).toHaveBeenCalledWith(
+          'source-db-id'
+        );
         expect(dataSource).toBeDefined();
-        
+
         // Verify: Cleanup function releases both documents
         release();
         expect(mockRefRelease).toHaveBeenCalled();
@@ -641,13 +635,11 @@ describe('Integration Tests: AI Document Editor', () => {
         const sharedDbModel = {
           props: {
             columns$: {
-              value: [
-                { id: 'col-1', name: 'Task', type: 'text' },
-              ],
+              value: [{ id: 'col-1', name: 'Task', type: 'text' }],
             },
           },
         };
-        
+
         const mockSourceDbBlock = {
           flavour: 'affine:database',
           model: sharedDbModel,
@@ -682,7 +674,7 @@ describe('Integration Tests: AI Document Editor', () => {
 
         // Verify: Transaction was executed on source
         expect(transactionLog).toContain('source-transaction');
-        
+
         // In a real Y.js scenario, this change would automatically
         // propagate to all references viewing the same database
         expect(mockSourceDoc.blockSuiteDoc.transact).toHaveBeenCalled();
@@ -727,7 +719,7 @@ describe('Integration Tests: AI Document Editor', () => {
           id: 'note-1',
           children: [],
         };
-        
+
         const mockDoc = {
           waitForSyncReady: vi.fn().mockResolvedValue(undefined),
           blockSuiteDoc: {
@@ -757,7 +749,9 @@ describe('Integration Tests: AI Document Editor', () => {
     describe('No Active Document Scenario', () => {
       it('should handle no active document context (Requirements 8.3)', async () => {
         // Setup: No active document
-        vi.spyOn(contextManager, 'getActiveDocumentContext').mockReturnValue(null);
+        vi.spyOn(contextManager, 'getActiveDocumentContext').mockReturnValue(
+          null
+        );
 
         // Execute: Try to execute command without active document
         const result = await aiService.executeCommand('edit this page');
@@ -770,7 +764,9 @@ describe('Integration Tests: AI Document Editor', () => {
 
       it('should prompt user when no document is active', async () => {
         // Setup: No active document
-        vi.spyOn(contextManager, 'getActiveDocumentContext').mockReturnValue(null);
+        vi.spyOn(contextManager, 'getActiveDocumentContext').mockReturnValue(
+          null
+        );
 
         // Execute: Get active context
         const context = aiService.getActiveDocumentContext();
@@ -815,7 +811,7 @@ describe('Integration Tests: AI Document Editor', () => {
         const mockWrongBlock = {
           flavour: 'affine:paragraph', // Not a database
         };
-        
+
         const mockSourceDoc = {
           waitForSyncReady: vi.fn().mockResolvedValue(undefined),
           blockSuiteDoc: {
@@ -872,7 +868,9 @@ describe('Integration Tests: AI Document Editor', () => {
       it('should handle permission denied when opening document (Requirements 8.4)', async () => {
         // Setup: DocsService throws permission error
         vi.mocked(mockDocsService.open!).mockImplementation(() => {
-          throw new Error('Permission denied: User does not have access to this document');
+          throw new Error(
+            'Permission denied: User does not have access to this document'
+          );
         });
 
         // Execute: Try to edit document without permission
@@ -899,7 +897,9 @@ describe('Integration Tests: AI Document Editor', () => {
 
       it('should provide clear error message for permission issues', async () => {
         // Setup: Mock permission error
-        const permissionError = new Error('Permission denied: Read-only access');
+        const permissionError = new Error(
+          'Permission denied: Read-only access'
+        );
         vi.mocked(mockDocsService.open!).mockImplementation(() => {
           throw permissionError;
         });
@@ -923,9 +923,13 @@ describe('Integration Tests: AI Document Editor', () => {
         // Setup: Document sync fails
         const mockRelease = vi.fn();
         const mockDoc = {
-          waitForSyncReady: vi.fn().mockRejectedValue(
-            new Error('Sync timeout: Document failed to sync within 30 seconds')
-          ),
+          waitForSyncReady: vi
+            .fn()
+            .mockRejectedValue(
+              new Error(
+                'Sync timeout: Document failed to sync within 30 seconds'
+              )
+            ),
         };
 
         vi.mocked(mockDocsService.open!).mockReturnValue({
@@ -934,7 +938,10 @@ describe('Integration Tests: AI Document Editor', () => {
         });
 
         // Execute: Try to edit document with sync failure
-        const result = await aiService.editDocument('doc-id', 'edit instructions');
+        const result = await aiService.editDocument(
+          'doc-id',
+          'edit instructions'
+        );
 
         // Verify: Error is handled and document is released
         expect(result.success).toBe(false);
@@ -953,12 +960,12 @@ describe('Integration Tests: AI Document Editor', () => {
             },
           },
         };
-        
+
         const mockDbBlock = {
           flavour: 'affine:database',
           model: mockDbModel,
         };
-        
+
         const mockDoc = {
           waitForSyncReady: vi.fn().mockResolvedValue(undefined),
           blockSuiteDoc: {
@@ -976,7 +983,13 @@ describe('Integration Tests: AI Document Editor', () => {
 
         // Execute: Try to update cell with transaction failure
         await expect(
-          aiService.updateDatabaseCell('doc-id', 'db-id', 'row-1', 'col-1', 'value')
+          aiService.updateDatabaseCell(
+            'doc-id',
+            'db-id',
+            'row-1',
+            'col-1',
+            'value'
+          )
         ).rejects.toThrow('Y.js transaction failed');
 
         // Verify: Document is still released
@@ -987,29 +1000,27 @@ describe('Integration Tests: AI Document Editor', () => {
     describe('Complex Integration Scenarios', () => {
       it('should handle complete workflow: create database, add reference, edit through reference', async () => {
         // This test simulates a complete user workflow
-        
+
         // Step 1: Create database in source document
         const mockSourceRelease = vi.fn();
         const mockSourceNoteBlock = {
           id: 'source-note-1',
           model: { children: [] },
         };
-        
+
         const mockDbModel = {
           props: {
             columns$: {
-              value: [
-                { id: 'col-1', name: 'Task', type: 'text' },
-              ],
+              value: [{ id: 'col-1', name: 'Task', type: 'text' }],
             },
           },
         };
-        
+
         const mockDbBlock = {
           flavour: 'affine:database',
           model: mockDbModel,
         };
-        
+
         const mockSourceDoc = {
           waitForSyncReady: vi.fn().mockResolvedValue(undefined),
           blockSuiteDoc: {
@@ -1037,7 +1048,7 @@ describe('Integration Tests: AI Document Editor', () => {
           id: 'target-note-1',
           model: { children: [] },
         };
-        
+
         const mockTargetDoc = {
           waitForSyncReady: vi.fn().mockResolvedValue(undefined),
           blockSuiteDoc: {

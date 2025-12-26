@@ -54,14 +54,14 @@ import { AIDocumentEditorService } from '@affine/core/modules/ai-document-editor
 
 function MyComponent() {
   const aiDocService = useService(AIDocumentEditorService);
-  
+
   const handleCommand = async (command: string) => {
     const result = await aiDocService.executeCommand(command);
     if (result.success) {
       console.log('Command executed successfully');
     }
   };
-  
+
   return <button onClick={() => handleCommand('Add a task database')}>
     Execute Command
   </button>;
@@ -75,13 +75,10 @@ Execute a command with automatic context detection:
 ```typescript
 import { AIDocumentEditorService } from '@affine/core/modules/ai-document-editor';
 
-async function executeSimpleCommand(
-  aiDocService: AIDocumentEditorService,
-  command: string
-) {
+async function executeSimpleCommand(aiDocService: AIDocumentEditorService, command: string) {
   try {
     const result = await aiDocService.executeCommand(command);
-    
+
     if (result.success) {
       console.log(`Affected ${result.affectedBlocks.length} blocks`);
       return result;
@@ -94,10 +91,7 @@ async function executeSimpleCommand(
 }
 
 // Usage
-await executeSimpleCommand(
-  aiDocService,
-  'Add a paragraph about project goals'
-);
+await executeSimpleCommand(aiDocService, 'Add a paragraph about project goals');
 ```
 
 ### Document Editing
@@ -105,17 +99,13 @@ await executeSimpleCommand(
 Edit a specific document:
 
 ```typescript
-async function editDocumentContent(
-  aiDocService: AIDocumentEditorService,
-  docId: string,
-  instructions: string
-) {
+async function editDocumentContent(aiDocService: AIDocumentEditorService, docId: string, instructions: string) {
   const result = await aiDocService.editDocument(
     docId,
     instructions,
     false // No preview
   );
-  
+
   if (result.success) {
     console.log('Document edited successfully');
     console.log('Changes:', result.changes);
@@ -123,11 +113,7 @@ async function editDocumentContent(
 }
 
 // Usage
-await editDocumentContent(
-  aiDocService,
-  'doc-123',
-  'Update the introduction to emphasize security features'
-);
+await editDocumentContent(aiDocService, 'doc-123', 'Update the introduction to emphasize security features');
 ```
 
 ## Common Use Cases
@@ -137,65 +123,55 @@ await editDocumentContent(
 Create a complete task management system with databases and references:
 
 ```typescript
-import { 
-  AIDocumentEditorService,
-  DatabaseReferenceService 
-} from '@affine/core/modules/ai-document-editor';
+import { AIDocumentEditorService, DatabaseReferenceService } from '@affine/core/modules/ai-document-editor';
 
-async function setupTaskManagement(
-  aiDocService: AIDocumentEditorService,
-  dbRefService: DatabaseReferenceService,
-  projectDocId: string,
-  personalDocId: string
-) {
+async function setupTaskManagement(aiDocService: AIDocumentEditorService, dbRefService: DatabaseReferenceService, projectDocId: string, personalDocId: string) {
   // 1. Create main task database in project document
-  const taskDbId = await aiDocService.createDatabase(
-    projectDocId,
-    {
-      name: 'Project Tasks',
-      columns: [
-        { name: 'Title', type: 'title' },
-        { name: 'Status', type: 'select', data: { 
-          options: ['Todo', 'In Progress', 'Done'] 
-        }},
-        { name: 'Priority', type: 'select', data: { 
-          options: ['Low', 'Medium', 'High'] 
-        }},
-        { name: 'Assignee', type: 'text' },
-        { name: 'Due Date', type: 'date' }
-      ],
-      viewType: 'table',
-      initialRows: [
-        {
-          Title: 'Set up development environment',
-          Status: 'Todo',
-          Priority: 'High',
-          Assignee: 'Alice',
-          'Due Date': new Date('2024-02-01')
-        }
-      ]
-    }
-  );
-  
+  const taskDbId = await aiDocService.createDatabase(projectDocId, {
+    name: 'Project Tasks',
+    columns: [
+      { name: 'Title', type: 'title' },
+      {
+        name: 'Status',
+        type: 'select',
+        data: {
+          options: ['Todo', 'In Progress', 'Done'],
+        },
+      },
+      {
+        name: 'Priority',
+        type: 'select',
+        data: {
+          options: ['Low', 'Medium', 'High'],
+        },
+      },
+      { name: 'Assignee', type: 'text' },
+      { name: 'Due Date', type: 'date' },
+    ],
+    viewType: 'table',
+    initialRows: [
+      {
+        Title: 'Set up development environment',
+        Status: 'Todo',
+        Priority: 'High',
+        Assignee: 'Alice',
+        'Due Date': new Date('2024-02-01'),
+      },
+    ],
+  });
+
   // 2. Create a kanban view
-  const { dataSource, release } = await dbRefService.getDataSourceForReference(
-    projectDocId,
-    taskDbId
-  );
-  
+  const { dataSource, release } = await dbRefService.getDataSourceForReference(projectDocId, taskDbId);
+
   try {
     dataSource.viewManager.viewAdd('kanban');
   } finally {
     release();
   }
-  
+
   // 3. Add reference to personal workspace
-  const refId = await dbRefService.createReference(
-    personalDocId,
-    projectDocId,
-    taskDbId
-  );
-  
+  const refId = await dbRefService.createReference(personalDocId, projectDocId, taskDbId);
+
   console.log('Task management system set up successfully');
   return { taskDbId, refId };
 }
@@ -206,42 +182,35 @@ async function setupTaskManagement(
 Automatically extract and track action items from meeting notes:
 
 ```typescript
-async function processMeetingNotes(
-  aiDocService: AIDocumentEditorService,
-  meetingDocId: string,
-  actionItemsDocId: string
-) {
+async function processMeetingNotes(aiDocService: AIDocumentEditorService, meetingDocId: string, actionItemsDocId: string) {
   // 1. Create action items database in meeting doc
-  const actionDbId = await aiDocService.createDatabase(
-    meetingDocId,
-    {
-      name: 'Action Items',
-      columns: [
-        { name: 'Action', type: 'title' },
-        { name: 'Owner', type: 'text' },
-        { name: 'Due Date', type: 'date' },
-        { name: 'Status', type: 'select', data: { 
-          options: ['Not Started', 'In Progress', 'Complete'] 
-        }}
-      ],
-      viewType: 'table'
-    }
-  );
-  
+  const actionDbId = await aiDocService.createDatabase(meetingDocId, {
+    name: 'Action Items',
+    columns: [
+      { name: 'Action', type: 'title' },
+      { name: 'Owner', type: 'text' },
+      { name: 'Due Date', type: 'date' },
+      {
+        name: 'Status',
+        type: 'select',
+        data: {
+          options: ['Not Started', 'In Progress', 'Complete'],
+        },
+      },
+    ],
+    viewType: 'table',
+  });
+
   // 2. Use AI to extract action items from meeting notes
   await aiDocService.executeCommand(
     `Analyze the meeting notes and add action items to the Action Items database. 
      Extract any tasks mentioned with their owners and deadlines.`
   );
-  
+
   // 3. Create reference in central action items tracker
   const dbRefService = useService(DatabaseReferenceService);
-  await dbRefService.createReference(
-    actionItemsDocId,
-    meetingDocId,
-    actionDbId
-  );
-  
+  await dbRefService.createReference(actionItemsDocId, meetingDocId, actionDbId);
+
   return actionDbId;
 }
 ```
@@ -251,47 +220,31 @@ async function processMeetingNotes(
 Create a dashboard that aggregates data from multiple sources:
 
 ```typescript
-async function createProjectDashboard(
-  aiDocService: AIDocumentEditorService,
-  dbRefService: DatabaseReferenceService,
-  dashboardDocId: string,
-  sourceDocuments: Array<{ docId: string; dbId: string; viewId?: string }>
-) {
+async function createProjectDashboard(aiDocService: AIDocumentEditorService, dbRefService: DatabaseReferenceService, dashboardDocId: string, sourceDocuments: Array<{ docId: string; dbId: string; viewId?: string }>) {
   // Add title
-  await aiDocService.addContent(
-    dashboardDocId,
-    {
-      type: 'affine:paragraph',
-      props: { 
-        text: 'Project Dashboard',
-        type: 'h1'
-      }
-    }
-  );
-  
+  await aiDocService.addContent(dashboardDocId, {
+    type: 'affine:paragraph',
+    props: {
+      text: 'Project Dashboard',
+      type: 'h1',
+    },
+  });
+
   // Add references to all source databases
   for (const source of sourceDocuments) {
     // Add section heading
-    await aiDocService.addContent(
-      dashboardDocId,
-      {
-        type: 'affine:paragraph',
-        props: { 
-          text: `Data from ${source.docId}`,
-          type: 'h2'
-        }
-      }
-    );
-    
+    await aiDocService.addContent(dashboardDocId, {
+      type: 'affine:paragraph',
+      props: {
+        text: `Data from ${source.docId}`,
+        type: 'h2',
+      },
+    });
+
     // Add database reference
-    await dbRefService.createReference(
-      dashboardDocId,
-      source.docId,
-      source.dbId,
-      source.viewId
-    );
+    await dbRefService.createReference(dashboardDocId, source.docId, source.dbId, source.viewId);
   }
-  
+
   console.log('Dashboard created with all references');
 }
 ```
@@ -301,11 +254,7 @@ async function createProjectDashboard(
 Create reusable content templates:
 
 ```typescript
-async function applyTemplate(
-  aiDocService: AIDocumentEditorService,
-  docId: string,
-  templateType: 'project-plan' | 'meeting-notes' | 'design-doc'
-) {
+async function applyTemplate(aiDocService: AIDocumentEditorService, docId: string, templateType: 'project-plan' | 'meeting-notes' | 'design-doc') {
   const templates = {
     'project-plan': `
       Add the following structure:
@@ -340,9 +289,9 @@ async function applyTemplate(
       - Paragraph: Architecture description
       - Heading: Implementation Plan
       - Create a database with columns: Task, Priority, Status, Assignee
-    `
+    `,
   };
-  
+
   const template = templates[templateType];
   await aiDocService.executeCommand(template);
 }
@@ -364,11 +313,8 @@ async function batchDatabaseOperations(
     data: any;
   }>
 ) {
-  const { dataSource, release } = await dbRefService.getDataSourceForReference(
-    docId,
-    dbId
-  );
-  
+  const { dataSource, release } = await dbRefService.getDataSourceForReference(docId, dbId);
+
   try {
     // Use transaction for atomic operations
     for (const op of operations) {
@@ -382,11 +328,7 @@ async function batchDatabaseOperations(
           }
         });
       } else if (op.type === 'updateCell') {
-        dataSource.cellValueChange(
-          op.data.rowId,
-          op.data.propertyId,
-          op.data.value
-        );
+        dataSource.cellValueChange(op.data.rowId, op.data.propertyId, op.data.value);
       }
     }
   } finally {
@@ -400,9 +342,9 @@ async function batchDatabaseOperations(
 Implement preview workflow:
 
 ```typescript
-import { 
+import {
   AIDocumentEditorService,
-  ChangePreviewService 
+  ChangePreviewService
 } from '@affine/core/modules/ai-document-editor';
 
 async function executeWithPreview(
@@ -412,17 +354,17 @@ async function executeWithPreview(
   onPreview: (preview: ChangePreview) => Promise<boolean>
 ) {
   // Execute command with preview
-  const result = await aiDocService.executeCommand(command, { 
-    preview: true 
+  const result = await aiDocService.executeCommand(command, {
+    preview: true
   });
-  
+
   if (!result.success || !result.preview) {
     throw new Error('Failed to generate preview');
   }
-  
+
   // Show preview to user and get approval
   const approved = await onPreview(result.preview);
-  
+
   if (approved) {
     // Apply changes
     await changePreviewService.applyChanges(
@@ -442,7 +384,7 @@ function CommandWithPreview() {
   const aiDocService = useService(AIDocumentEditorService);
   const changePreviewService = useService(ChangePreviewService);
   const [preview, setPreview] = useState<ChangePreview | null>(null);
-  
+
   const handleCommand = async (command: string) => {
     await executeWithPreview(
       aiDocService,
@@ -458,7 +400,7 @@ function CommandWithPreview() {
       }
     );
   };
-  
+
   return (
     <>
       <CommandInput onSubmit={handleCommand} />
@@ -485,25 +427,20 @@ function CommandWithPreview() {
 Use document context for intelligent operations:
 
 ```typescript
-async function smartDatabaseOperation(
-  aiDocService: AIDocumentEditorService,
-  operation: string
-) {
+async function smartDatabaseOperation(aiDocService: AIDocumentEditorService, operation: string) {
   // Get current context
   const context = aiDocService.getActiveDocumentContext();
-  
+
   if (!context) {
     throw new Error('No active document');
   }
-  
+
   // Check if document has databases
   if (context.databases.length === 0) {
     // No databases, create one first
-    await aiDocService.executeCommand(
-      'Create a task database with title, status, and assignee columns'
-    );
+    await aiDocService.executeCommand('Create a task database with title, status, and assignee columns');
   }
-  
+
   // Now execute the operation with context
   await aiDocService.executeCommand(operation);
 }
@@ -514,26 +451,18 @@ async function smartDatabaseOperation(
 Implement robust error handling:
 
 ```typescript
-import { 
-  DocumentEditError,
-  DatabaseReferenceError,
-  CommandParseError 
-} from '@affine/core/modules/ai-document-editor';
+import { DocumentEditError, DatabaseReferenceError, CommandParseError } from '@affine/core/modules/ai-document-editor';
 
-async function executeWithRecovery(
-  aiDocService: AIDocumentEditorService,
-  command: string,
-  maxRetries: number = 3
-) {
+async function executeWithRecovery(aiDocService: AIDocumentEditorService, command: string, maxRetries: number = 3) {
   let lastError: Error | null = null;
-  
+
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
       const result = await aiDocService.executeCommand(command);
       return result;
     } catch (error) {
       lastError = error as Error;
-      
+
       if (error instanceof CommandParseError) {
         // Command syntax error - don't retry
         throw error;
@@ -551,7 +480,7 @@ async function executeWithRecovery(
       }
     }
   }
-  
+
   throw new Error(`Failed after ${maxRetries} attempts: ${lastError?.message}`);
 }
 
@@ -569,25 +498,20 @@ Monitor and react to changes:
 ```typescript
 import { DocumentContextManager } from '@affine/core/modules/ai-document-editor';
 
-function setupRealtimeSync(
-  contextManager: DocumentContextManager,
-  onDocumentChange: (docId: string) => void
-) {
+function setupRealtimeSync(contextManager: DocumentContextManager, onDocumentChange: (docId: string) => void) {
   // Observe active document changes
-  const subscription = contextManager.observeActiveDocument().subscribe(
-    (doc) => {
-      if (doc) {
-        onDocumentChange(doc.id);
-        
-        // Set up listeners for document changes
-        doc.blockSuiteDoc.slots.blockUpdated.on((update) => {
-          console.log('Block updated:', update);
-          // React to changes
-        });
-      }
+  const subscription = contextManager.observeActiveDocument().subscribe(doc => {
+    if (doc) {
+      onDocumentChange(doc.id);
+
+      // Set up listeners for document changes
+      doc.blockSuiteDoc.slots.blockUpdated.on(update => {
+        console.log('Block updated:', update);
+        // React to changes
+      });
     }
-  );
-  
+  });
+
   // Cleanup
   return () => subscription.unsubscribe();
 }
@@ -604,7 +528,7 @@ import { AICommandInput } from '@affine/core/modules/ai-document-editor/ui';
 
 function MyWorkspace() {
   const aiDocService = useService(AIDocumentEditorService);
-  
+
   const handleCommand = async (command: string) => {
     const result = await aiDocService.executeCommand(command);
     if (result.success) {
@@ -613,7 +537,7 @@ function MyWorkspace() {
       showErrorNotification(result.error?.message || 'Command failed');
     }
   };
-  
+
   return (
     <div>
       <AICommandInput onSubmit={handleCommand} />
@@ -646,20 +570,20 @@ function CustomPreviewDialog({ preview, onApprove, onReject }: PreviewDialogProp
             <PreviewBlock key={block.blockId} block={block} type="add" />
           ))}
         </Section>
-        
+
         <Section title="Modifications">
           {preview.modifications.map(block => (
             <PreviewBlock key={block.blockId} block={block} type="modify" />
           ))}
         </Section>
-        
+
         <Section title="Deletions">
           {preview.deletions.map(block => (
             <PreviewBlock key={block.blockId} block={block} type="delete" />
           ))}
         </Section>
       </DialogContent>
-      
+
       <DialogActions>
         <Button onClick={onReject} variant="secondary">
           Reject
@@ -681,11 +605,11 @@ Show operation status:
 function CommandStatus() {
   const [status, setStatus] = useState<'idle' | 'executing' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
-  
+
   const executeCommand = async (command: string) => {
     setStatus('executing');
     setMessage('Executing command...');
-    
+
     try {
       const result = await aiDocService.executeCommand(command);
       setStatus('success');
@@ -695,7 +619,7 @@ function CommandStatus() {
       setMessage(error.message);
     }
   };
-  
+
   return (
     <div>
       <StatusBadge status={status} />
@@ -717,33 +641,28 @@ import { AIDocumentEditorService } from '@affine/core/modules/ai-document-editor
 
 describe('AI Document Editor Integration', () => {
   let aiDocService: AIDocumentEditorService;
-  
+
   beforeEach(() => {
     // Set up test environment
     aiDocService = createTestService();
   });
-  
+
   it('should execute simple command', async () => {
-    const result = await aiDocService.executeCommand(
-      'Add a paragraph with test content'
-    );
-    
+    const result = await aiDocService.executeCommand('Add a paragraph with test content');
+
     expect(result.success).toBe(true);
     expect(result.affectedBlocks.length).toBeGreaterThan(0);
   });
-  
+
   it('should create database with specified structure', async () => {
-    const dbId = await aiDocService.createDatabase(
-      'test-doc',
-      {
-        columns: [
-          { name: 'Title', type: 'title' },
-          { name: 'Status', type: 'select', data: { options: ['Todo', 'Done'] } }
-        ],
-        viewType: 'table'
-      }
-    );
-    
+    const dbId = await aiDocService.createDatabase('test-doc', {
+      columns: [
+        { name: 'Title', type: 'title' },
+        { name: 'Status', type: 'select', data: { options: ['Todo', 'Done'] } },
+      ],
+      viewType: 'table',
+    });
+
     expect(dbId).toBeTruthy();
   });
 });
@@ -758,34 +677,22 @@ describe('Task Management Workflow', () => {
   it('should create complete task management system', async () => {
     // Create project document
     const projectDoc = await createTestDocument();
-    
+
     // Create task database
-    const taskDbId = await aiDocService.createDatabase(
-      projectDoc.id,
-      taskDatabaseConfig
-    );
-    
+    const taskDbId = await aiDocService.createDatabase(projectDoc.id, taskDatabaseConfig);
+
     // Add initial tasks
-    await aiDocService.executeCommand(
-      'Add task: Complete documentation, Status: Todo, Assignee: Alice'
-    );
-    
+    await aiDocService.executeCommand('Add task: Complete documentation, Status: Todo, Assignee: Alice');
+
     // Create personal document
     const personalDoc = await createTestDocument();
-    
+
     // Add reference
-    const refId = await dbRefService.createReference(
-      personalDoc.id,
-      projectDoc.id,
-      taskDbId
-    );
-    
+    const refId = await dbRefService.createReference(personalDoc.id, projectDoc.id, taskDbId);
+
     // Verify reference works
-    const { dataSource, release } = await dbRefService.getDataSourceForReference(
-      personalDoc.id,
-      refId
-    );
-    
+    const { dataSource, release } = await dbRefService.getDataSourceForReference(personalDoc.id, refId);
+
     try {
       const rows = dataSource.rows;
       expect(rows.length).toBeGreaterThan(0);
@@ -806,22 +713,19 @@ Cache document context to avoid repeated lookups:
 class ContextCache {
   private cache = new Map<string, { context: DocumentContext; timestamp: number }>();
   private ttl = 5000; // 5 seconds
-  
-  async getContext(
-    docId: string,
-    contextManager: DocumentContextManager
-  ): Promise<DocumentContext> {
+
+  async getContext(docId: string, contextManager: DocumentContextManager): Promise<DocumentContext> {
     const cached = this.cache.get(docId);
-    
+
     if (cached && Date.now() - cached.timestamp < this.ttl) {
       return cached.context;
     }
-    
+
     const doc = await docsService.open(docId);
     const context = await contextManager.enrichContext(doc.doc);
-    
+
     this.cache.set(docId, { context, timestamp: Date.now() });
-    
+
     return context;
   }
 }
@@ -832,25 +736,15 @@ class ContextCache {
 Create multiple references efficiently:
 
 ```typescript
-async function createMultipleReferences(
-  dbRefService: DatabaseReferenceService,
-  targetDocId: string,
-  sources: Array<{ docId: string; dbId: string }>
-) {
+async function createMultipleReferences(dbRefService: DatabaseReferenceService, targetDocId: string, sources: Array<{ docId: string; dbId: string }>) {
   // Validate all sources first
-  const validations = await Promise.all(
-    sources.map(s => dbRefService.validateReference(s.docId, s.dbId))
-  );
-  
+  const validations = await Promise.all(sources.map(s => dbRefService.validateReference(s.docId, s.dbId)));
+
   const validSources = sources.filter((_, i) => validations[i]);
-  
+
   // Create all references in parallel
-  const refIds = await Promise.all(
-    validSources.map(s => 
-      dbRefService.createReference(targetDocId, s.docId, s.dbId)
-    )
-  );
-  
+  const refIds = await Promise.all(validSources.map(s => dbRefService.createReference(targetDocId, s.docId, s.dbId)));
+
   return refIds;
 }
 ```
@@ -874,7 +768,7 @@ function CommandInput() {
   const handleInput = (command: string) => {
     debouncedExecuteCommand(aiDocService, command);
   };
-  
+
   return <input onChange={(e) => handleInput(e.target.value)} />;
 }
 ```
@@ -929,10 +823,10 @@ try {
 
 ```typescript
 // ❌ Vague
-"Add something to the database"
+'Add something to the database';
 
 // ✅ Specific
-"Add a row to the Tasks database with Title: 'New task', Status: 'Todo'"
+"Add a row to the Tasks database with Title: 'New task', Status: 'Todo'";
 ```
 
 ### Debug Mode
@@ -958,22 +852,19 @@ if (window.aiDocDebug) {
 Monitor operation performance:
 
 ```typescript
-async function executeWithTiming(
-  aiDocService: AIDocumentEditorService,
-  command: string
-) {
+async function executeWithTiming(aiDocService: AIDocumentEditorService, command: string) {
   const start = performance.now();
-  
+
   try {
     const result = await aiDocService.executeCommand(command);
     const duration = performance.now() - start;
-    
+
     console.log(`Command executed in ${duration.toFixed(2)}ms`);
-    
+
     if (duration > 1000) {
       console.warn('Slow command execution detected');
     }
-    
+
     return result;
   } catch (error) {
     const duration = performance.now() - start;
@@ -993,6 +884,7 @@ async function executeWithTiming(
 ## Support
 
 For issues or questions:
+
 - Check existing documentation
 - Review test files for examples
 - Consult the design document for architecture details

@@ -1,9 +1,5 @@
 import { CommandParseError } from './errors';
-import type {
-  CommandType,
-  DocumentContext,
-  ParsedCommand,
-} from './types';
+import type { CommandType, DocumentContext, ParsedCommand } from './types';
 import { CommandType as CommandTypeEnum } from './types';
 
 /**
@@ -46,10 +42,7 @@ export class CommandParser {
       const normalizedCommand = command.toLowerCase().trim();
 
       if (!normalizedCommand) {
-        throw new CommandParseError(
-          'Command cannot be empty',
-          command
-        );
+        throw new CommandParseError('Command cannot be empty', command);
       }
 
       // Determine command type
@@ -91,12 +84,21 @@ export class CommandParser {
     const normalizedCommand = command.toLowerCase();
 
     // Check for database operations first (more specific)
-    if (this.containsAnyKeyword(normalizedCommand, this.COMMAND_KEYWORDS.database)) {
+    if (
+      this.containsAnyKeyword(normalizedCommand, this.COMMAND_KEYWORDS.database)
+    ) {
       // Distinguish between creating a new database and referencing an existing one
-      if (this.containsAnyKeyword(normalizedCommand, this.COMMAND_KEYWORDS.reference)) {
+      if (
+        this.containsAnyKeyword(
+          normalizedCommand,
+          this.COMMAND_KEYWORDS.reference
+        )
+      ) {
         return CommandTypeEnum.Reference;
       }
-      if (this.containsAnyKeyword(normalizedCommand, this.COMMAND_KEYWORDS.create)) {
+      if (
+        this.containsAnyKeyword(normalizedCommand, this.COMMAND_KEYWORDS.create)
+      ) {
         return CommandTypeEnum.Create;
       }
       // If it mentions database but not create/reference, it's likely a database operation
@@ -104,7 +106,12 @@ export class CommandParser {
     }
 
     // Check for reference commands
-    if (this.containsAnyKeyword(normalizedCommand, this.COMMAND_KEYWORDS.reference)) {
+    if (
+      this.containsAnyKeyword(
+        normalizedCommand,
+        this.COMMAND_KEYWORDS.reference
+      )
+    ) {
       return CommandTypeEnum.Reference;
     }
 
@@ -114,12 +121,16 @@ export class CommandParser {
     }
 
     // Check for create commands
-    if (this.containsAnyKeyword(normalizedCommand, this.COMMAND_KEYWORDS.create)) {
+    if (
+      this.containsAnyKeyword(normalizedCommand, this.COMMAND_KEYWORDS.create)
+    ) {
       return CommandTypeEnum.Create;
     }
 
     // Check for edit commands
-    if (this.containsAnyKeyword(normalizedCommand, this.COMMAND_KEYWORDS.edit)) {
+    if (
+      this.containsAnyKeyword(normalizedCommand, this.COMMAND_KEYWORDS.edit)
+    ) {
       return CommandTypeEnum.Edit;
     }
 
@@ -145,7 +156,9 @@ export class CommandParser {
     }
 
     // Check for explicit document references (e.g., "in document abc123")
-    const docIdMatch = normalizedCommand.match(/(?:in|to|on)\s+(?:document|page|doc)\s+([a-zA-Z0-9-_]+)/);
+    const docIdMatch = normalizedCommand.match(
+      /(?:in|to|on)\s+(?:document|page|doc)\s+([a-zA-Z0-9-_]+)/
+    );
     if (docIdMatch && docIdMatch[1]) {
       return docIdMatch[1];
     }
@@ -168,9 +181,15 @@ export class CommandParser {
 
     // Extract position information for add commands
     if (type === CommandTypeEnum.Add) {
-      if (command.includes('at the beginning') || command.includes('at the start')) {
+      if (
+        command.includes('at the beginning') ||
+        command.includes('at the start')
+      ) {
         parameters.position = 'start';
-      } else if (command.includes('at the end') || command.includes('at the bottom')) {
+      } else if (
+        command.includes('at the end') ||
+        command.includes('at the bottom')
+      ) {
         parameters.position = 'end';
       } else if (command.includes('after')) {
         parameters.position = 'after';
@@ -180,7 +199,10 @@ export class CommandParser {
     }
 
     // Extract database-related parameters
-    if (type === CommandTypeEnum.Create || type === CommandTypeEnum.DatabaseOperation) {
+    if (
+      type === CommandTypeEnum.Create ||
+      type === CommandTypeEnum.DatabaseOperation
+    ) {
       if (command.includes('table')) {
         parameters.viewType = 'table';
       } else if (command.includes('kanban') || command.includes('board')) {

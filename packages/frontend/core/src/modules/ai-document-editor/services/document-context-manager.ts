@@ -8,7 +8,7 @@ import { resolveRouteLinkMeta } from '../../navigation/utils';
 
 /**
  * DocumentContextManager tracks the active document and enriches it with context information
- * 
+ *
  * This service:
  * - Tracks the currently active document from the workbench
  * - Scans documents for database blocks
@@ -115,7 +115,7 @@ export class DocumentContextManager extends Service {
     // Use the existing route resolution utility
     const fullUrl = `http://localhost${pathname}`;
     const meta = resolveRouteLinkMeta(fullUrl);
-    
+
     if (meta && 'docId' in meta) {
       return meta.docId ?? null;
     }
@@ -147,7 +147,8 @@ export class DocumentContextManager extends Service {
 
     try {
       // Get all database blocks
-      const databaseBlocks = blockSuiteDoc.getBlocksByFlavour('affine:database');
+      const databaseBlocks =
+        blockSuiteDoc.getBlocksByFlavour('affine:database');
 
       for (const block of databaseBlocks) {
         const model = block.model;

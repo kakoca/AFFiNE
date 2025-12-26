@@ -16,13 +16,13 @@ export interface ChangePreviewDialogProps {
 
 /**
  * ChangePreviewDialog displays a preview of proposed document changes
- * 
+ *
  * Features:
  * - Display additions, modifications, and deletions
  * - Approve/reject/modify actions
  * - Integration with ChangePreviewService
  * - Visual diff display
- * 
+ *
  * Requirements: 7.1, 7.2, 7.5, 11.7
  */
 export const ChangePreviewDialog = ({
@@ -57,7 +57,7 @@ export const ChangePreviewDialog = ({
   return (
     <Modal
       open={open}
-      onOpenChange={(open) => {
+      onOpenChange={open => {
         if (!open) {
           onClose();
         }

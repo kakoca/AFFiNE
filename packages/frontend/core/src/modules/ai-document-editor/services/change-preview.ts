@@ -15,13 +15,13 @@ import { DocumentEditError } from '../errors';
 
 /**
  * ChangePreviewService handles preview generation and application of document changes
- * 
+ *
  * This service:
  * - Generates previews by cloning document state and applying operations
  * - Tracks before/after states for each affected block
  * - Applies approved changes using transactions for atomicity
  * - Discards previews without affecting the original document
- * 
+ *
  * Requirements: 7.3, 7.4
  */
 export class ChangePreviewService extends Service {
@@ -33,14 +33,14 @@ export class ChangePreviewService extends Service {
 
   /**
    * Generate a preview of proposed document changes
-   * 
+   *
    * This method:
    * 1. Opens the target document
    * 2. Captures the current state of blocks that will be affected
    * 3. Simulates applying the operations to determine the after state
    * 4. Categorizes changes into additions, modifications, and deletions
    * 5. Stores the preview for later application or discard
-   * 
+   *
    * @param docId - The document ID to preview changes for
    * @param operations - The operations to preview
    * @returns A ChangePreview object containing before/after states
@@ -50,12 +50,12 @@ export class ChangePreviewService extends Service {
     operations: DocumentOperation[]
   ): Promise<ChangePreview> {
     let release: (() => void) | null = null;
-    
+
     try {
       const docRef = this.docsService.open(docId);
       release = docRef.release;
       const doc = docRef.doc;
-      
+
       await doc.waitForSyncReady();
       const bsDoc = doc.blockSuiteDoc;
 
@@ -72,10 +72,10 @@ export class ChangePreviewService extends Service {
             if (block) {
               // Capture before state
               const before = block.model.toSnapshot();
-              
+
               // Simulate the change to get after state
               const after = this.simulateEdit(before, editOp.changes);
-              
+
               modifications.push({
                 blockId: editOp.blockId,
                 before,
@@ -89,7 +89,7 @@ export class ChangePreviewService extends Service {
             const insertOp = operation as InsertOperation;
             // For insertions, we only have an after state
             const after = this.createBlockSnapshot(insertOp);
-            
+
             additions.push({
               blockId: nanoid(), // Generate temporary ID for preview
               after,
@@ -103,7 +103,7 @@ export class ChangePreviewService extends Service {
             if (block) {
               // Capture before state, no after state
               const before = block.model.toSnapshot();
-              
+
               deletions.push({
                 blockId: deleteOp.blockId,
                 before,
@@ -152,12 +152,12 @@ export class ChangePreviewService extends Service {
 
   /**
    * Apply approved changes to the document
-   * 
+   *
    * This method uses BlockSuite transactions to ensure atomicity.
    * If any operation fails, the entire transaction is rolled back.
-   * 
+   *
    * Requirements: 7.3, 8.1
-   * 
+   *
    * @param docId - The document ID to apply changes to
    * @param preview - The preview containing the operations to apply
    */
@@ -220,12 +220,12 @@ export class ChangePreviewService extends Service {
 
   /**
    * Discard a preview without applying changes
-   * 
+   *
    * This simply removes the preview from storage.
    * The original document remains unchanged.
-   * 
+   *
    * Requirements: 7.4
-   * 
+   *
    * @param previewId - The ID of the preview to discard
    */
   async discardPreview(previewId: string): Promise<void> {
@@ -234,7 +234,7 @@ export class ChangePreviewService extends Service {
 
   /**
    * Get a stored preview by ID
-   * 
+   *
    * @param previewId - The ID of the preview to retrieve
    * @returns The preview, or undefined if not found
    */
@@ -244,7 +244,7 @@ export class ChangePreviewService extends Service {
 
   /**
    * Simulate an edit operation on a block snapshot
-   * 
+   *
    * @param snapshot - The original block snapshot
    * @param changes - The changes to apply
    * @returns A new snapshot with the changes applied
@@ -255,7 +255,7 @@ export class ChangePreviewService extends Service {
   ): BlockSnapshot {
     // Create a shallow copy of the snapshot
     const simulated = { ...snapshot };
-    
+
     // Apply changes to the props
     simulated.props = {
       ...snapshot.props,
@@ -267,7 +267,7 @@ export class ChangePreviewService extends Service {
 
   /**
    * Create a block snapshot from an insert operation
-   * 
+   *
    * @param operation - The insert operation
    * @returns A block snapshot representing the new block
    */
@@ -283,9 +283,9 @@ export class ChangePreviewService extends Service {
 
   /**
    * Apply a single operation to a BlockSuite document
-   * 
+   *
    * This is called within a transaction context.
-   * 
+   *
    * @param bsDoc - The BlockSuite document
    * @param operation - The operation to apply
    */

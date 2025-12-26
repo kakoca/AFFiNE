@@ -14,13 +14,13 @@ export interface AICommandInputProps {
 
 /**
  * AICommandInput component provides a text input for executing AI document editing commands
- * 
+ *
  * Features:
  * - Natural language command input
  * - Command suggestions and autocomplete (future enhancement)
  * - Integration with AIDocumentEditorService
  * - Error handling and user feedback
- * 
+ *
  * Requirements: 11.7
  */
 export const AICommandInput = ({

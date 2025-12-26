@@ -18,13 +18,13 @@ export interface UserFriendlyError {
 
 /**
  * Translate technical errors into user-friendly messages with actionable suggestions
- * 
+ *
  * Requirements: 8.2, 8.3, 8.4
  */
 export class ErrorMessageTranslator {
   /**
    * Translate an AI document editor error into a user-friendly format
-   * 
+   *
    * @param error - The error to translate
    * @returns User-friendly error information
    */
@@ -32,36 +32,41 @@ export class ErrorMessageTranslator {
     // Check if it's an AI document editor error
     if ('type' in error && typeof (error as any).type === 'string') {
       const aiError = error as AIDocumentEditorError;
-      
+
       switch (aiError.type) {
         case AIDocumentEditorErrorType.DocumentEditError:
           return this.translateDocumentEditError(aiError as DocumentEditError);
-        
+
         case AIDocumentEditorErrorType.DatabaseReferenceError:
-          return this.translateDatabaseReferenceError(aiError as DatabaseReferenceError);
-        
+          return this.translateDatabaseReferenceError(
+            aiError as DatabaseReferenceError
+          );
+
         case AIDocumentEditorErrorType.CommandParseError:
           return this.translateCommandParseError(aiError as CommandParseError);
       }
     }
-    
+
     // Fall back to generic error translation
     return this.translateGenericError(error);
   }
 
   /**
    * Translate a DocumentEditError into user-friendly format
-   * 
+   *
    * Requirements: 8.2
    */
-  private static translateDocumentEditError(error: DocumentEditError): UserFriendlyError {
+  private static translateDocumentEditError(
+    error: DocumentEditError
+  ): UserFriendlyError {
     const { message, operation } = error;
 
     // Check for specific error patterns
     if (message.includes('No note block found')) {
       return {
         title: 'Document Structure Issue',
-        message: 'The document does not have the required structure to add content.',
+        message:
+          'The document does not have the required structure to add content.',
         suggestions: [
           'Try creating a new document',
           'Check if the document is properly initialized',
@@ -74,7 +79,8 @@ export class ErrorMessageTranslator {
     if (message.includes('transaction rolled back')) {
       return {
         title: 'Operation Failed',
-        message: 'The operation could not be completed and has been safely rolled back.',
+        message:
+          'The operation could not be completed and has been safely rolled back.',
         suggestions: [
           'Try the operation again',
           'Check if the document is still accessible',
@@ -124,10 +130,12 @@ export class ErrorMessageTranslator {
 
   /**
    * Translate a DatabaseReferenceError into user-friendly format
-   * 
+   *
    * Requirements: 8.3
    */
-  private static translateDatabaseReferenceError(error: DatabaseReferenceError): UserFriendlyError {
+  private static translateDatabaseReferenceError(
+    error: DatabaseReferenceError
+  ): UserFriendlyError {
     const { message } = error;
 
     // Check for specific error patterns
@@ -160,7 +168,8 @@ export class ErrorMessageTranslator {
     if (message.includes('No note block found in target document')) {
       return {
         title: 'Document Structure Issue',
-        message: 'The target document does not have the required structure to add a database reference.',
+        message:
+          'The target document does not have the required structure to add a database reference.',
         suggestions: [
           'Try creating a new document',
           'Check if the target document is properly initialized',
@@ -172,7 +181,8 @@ export class ErrorMessageTranslator {
     if (message.includes('Reference block not found')) {
       return {
         title: 'Reference Not Found',
-        message: 'The database reference you are trying to access could not be found.',
+        message:
+          'The database reference you are trying to access could not be found.',
         suggestions: [
           'Check if the reference still exists in the document',
           'Try refreshing the document',
@@ -198,7 +208,9 @@ export class ErrorMessageTranslator {
   /**
    * Translate a CommandParseError into user-friendly format
    */
-  private static translateCommandParseError(error: CommandParseError): UserFriendlyError {
+  private static translateCommandParseError(
+    error: CommandParseError
+  ): UserFriendlyError {
     const { message, command } = error;
 
     return {
@@ -232,7 +244,7 @@ export class ErrorMessageTranslator {
 
   /**
    * Simplify technical error messages for end users
-   * 
+   *
    * @param message - The technical error message
    * @returns A simplified, user-friendly message
    */
@@ -250,13 +262,15 @@ export class ErrorMessageTranslator {
 
   /**
    * Get suggestions for common error scenarios
-   * 
+   *
    * Requirements: 8.2, 8.3, 8.4
-   * 
+   *
    * @param errorType - The type of error
    * @returns Array of actionable suggestions
    */
-  static getSuggestionsForErrorType(errorType: AIDocumentEditorErrorType): string[] {
+  static getSuggestionsForErrorType(
+    errorType: AIDocumentEditorErrorType
+  ): string[] {
     switch (errorType) {
       case AIDocumentEditorErrorType.DocumentEditError:
         return [
@@ -293,28 +307,28 @@ export class ErrorMessageTranslator {
 
   /**
    * Format an error for display in the UI
-   * 
+   *
    * @param error - The error to format
    * @returns Formatted error message for display
    */
   static formatForDisplay(error: Error): string {
     const friendly = this.translate(error);
-    
+
     let formatted = `${friendly.title}\n\n${friendly.message}`;
-    
+
     if (friendly.suggestions.length > 0) {
       formatted += '\n\nSuggestions:';
       friendly.suggestions.forEach((suggestion, index) => {
         formatted += `\n${index + 1}. ${suggestion}`;
       });
     }
-    
+
     return formatted;
   }
 
   /**
    * Check if an error is retryable
-   * 
+   *
    * @param error - The error to check
    * @returns True if the operation can be retried
    */
