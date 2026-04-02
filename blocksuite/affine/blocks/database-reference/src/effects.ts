@@ -1,15 +1,8 @@
-import { DatabaseReferenceBlockSchemaExtension } from '@blocksuite/affine-model';
-import { BlockStdScope } from '@blocksuite/std';
+import { DatabaseReferenceBlockComponent } from './database-reference-block.js';
 
 export function effects() {
   customElements.define(
     'affine-database-reference',
-    // @ts-expect-error - dynamic import
-    () =>
-      import('./database-reference-block.js').then(
-        m => m.DatabaseReferenceBlockComponent
-      )
+    DatabaseReferenceBlockComponent
   );
-
-  BlockStdScope.mount(DatabaseReferenceBlockSchemaExtension);
 }

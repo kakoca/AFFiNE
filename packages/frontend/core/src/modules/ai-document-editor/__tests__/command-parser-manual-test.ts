@@ -4,8 +4,8 @@
  */
 
 import { CommandParser } from '../command-parser';
-import { CommandType } from '../types';
 import type { DocumentContext } from '../types';
+import { CommandType } from '../types';
 
 // Mock context
 const mockContext: DocumentContext = {

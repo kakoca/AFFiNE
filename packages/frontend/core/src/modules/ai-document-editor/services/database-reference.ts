@@ -1,7 +1,7 @@
-import { Service } from '@toeverything/infra';
-import { insertPositionToIndex } from '@blocksuite/affine-shared/utils';
 import { DatabaseBlockDataSource } from '@blocksuite/affine/blocks/database';
 import type { DatabaseBlockModel } from '@blocksuite/affine/model';
+import { insertPositionToIndex } from '@blocksuite/affine-shared/utils';
+import { Service } from '@toeverything/infra';
 
 import type { DocsService } from '../../doc';
 import { DatabaseReferenceError } from '../errors';

@@ -72,24 +72,59 @@ model_list:
       supports_vision: true
 
   # ============================================
-  # AWS Bedrock - Titan Embeddings
+  # Google Gemini - Fallback Models
   # ============================================
-  # Titan Embed Text v2 (Latest - 1024 dimensions)
-  # Best for: Text-only embeddings with 1024 dimensions (AFFiNE default)
-  # Supports: Up to 8192 input tokens
+  # Gemini 2.5 Flash (Fallback para quando Bedrock falhar)
+  - model_name: gemini-2-5-flash
+    litellm_params:
+      model: gemini/gemini-2.5-flash
+      api_key: os.environ/GEMINI_API_KEY
+    model_info:
+      mode: chat
+      supports_vision: true
+      supports_function_calling: true
+
+  # ============================================
+  # Google Gemini - Embedding Models
+  # ============================================
+  # Text Embedding 004 (Most economical - FREE tier available)
+  # Dimensions: 768 (default) - can be configured
+  # FREE: 1,500 requests per day
+  # Paid: $0.00001 per 1K characters (~$0.000025 per 1K tokens)
   # IMPORTANTE: Usando nome "text-embedding-ada-002" para compatibilidade com AFFiNE
   - model_name: text-embedding-ada-002
     litellm_params:
-      model: bedrock/amazon.titan-embed-text-v2:0
-      aws_region_name: os.environ/AWS_REGION_NAME
-      aws_access_key_id: os.environ/AWS_ACCESS_KEY_ID
-      aws_secret_access_key: os.environ/AWS_SECRET_ACCESS_KEY
+      model: gemini/text-embedding-004
+      api_key: os.environ/GEMINI_API_KEY
     model_info:
       mode: embedding
-      input_cost_per_token: 0.0000001  # $0.0001 per 1K tokens
-      output_dimensions: 1024
+      input_cost_per_token: 0.000000025  # $0.000025 per 1K tokens
+      output_dimensions: 768
   
-  # Alias alternativo (mantém titan-embed-text também)
+  # Alias alternativo
+  - model_name: text-embedding-004
+    litellm_params:
+      model: gemini/text-embedding-004
+      api_key: os.environ/GEMINI_API_KEY
+    model_info:
+      mode: embedding
+      input_cost_per_token: 0.000000025
+      output_dimensions: 768
+  
+  # Gemini embedding model alias (AFFiNE default when no override)
+  - model_name: gemini-embedding-001
+    litellm_params:
+      model: gemini/text-embedding-004
+      api_key: os.environ/GEMINI_API_KEY
+    model_info:
+      mode: embedding
+      input_cost_per_token: 0.000000025
+      output_dimensions: 768
+
+  # ============================================
+  # AWS Bedrock - Titan Embeddings (BACKUP)
+  # ============================================
+  # Titan Embed Text v2 (Backup - mais caro que Gemini)
   - model_name: titan-embed-text
     litellm_params:
       model: bedrock/amazon.titan-embed-text-v2:0
@@ -98,24 +133,10 @@ model_list:
       aws_secret_access_key: os.environ/AWS_SECRET_ACCESS_KEY
     model_info:
       mode: embedding
-      input_cost_per_token: 0.0000001  # $0.0001 per 1K tokens
-      output_dimensions: 1024
-  
-  # Gemini embedding model alias (AFFiNE default when no override)
-  # Maps to Titan for AWS Bedrock compatibility
-  - model_name: gemini-embedding-001
-    litellm_params:
-      model: bedrock/amazon.titan-embed-text-v2:0
-      aws_region_name: os.environ/AWS_REGION_NAME
-      aws_access_key_id: os.environ/AWS_ACCESS_KEY_ID
-      aws_secret_access_key: os.environ/AWS_SECRET_ACCESS_KEY
-    model_info:
-      mode: embedding
-      input_cost_per_token: 0.0000001  # $0.0001 per 1K tokens
+      input_cost_per_token: 0.0000001  # $0.0001 per 1K tokens (4x mais caro)
       output_dimensions: 1024
 
   # Titan Embed Text v1 (Fallback)
-  # Use if v2 has issues
   - model_name: titan-embed-text-v1
     litellm_params:
       model: bedrock/amazon.titan-embed-text-v1
@@ -174,16 +195,33 @@ model_list:
 # ============================================
 router_settings:
   routing_strategy: simple-shuffle  # Load balance between models
-  num_retries: 3
+  num_retries: 0  # Sem retries - vai direto para fallback
   timeout: 600  # 10 minutes
+  retry_after: 0  # Sem espera antes de fallback
+  allowed_fails: 1  # Apenas 1 falha antes de cooldown
+  cooldown_time: 300  # 5 minutos de cooldown para o modelo que falhou
+  
   fallbacks:
-    # Chat models fallbacks
-    - claude-4-5-sonnet: [claude-3-5-sonnet, claude-3-sonnet]
-    - claude-4-5-haiku: [claude-3-haiku]
-    - claude-3-5-sonnet: [claude-3-sonnet, claude-3-haiku]
-    - claude-3-opus: [claude-3-5-sonnet, claude-3-sonnet]
-    # Embedding models fallbacks
-    - titan-embed-text: [titan-embed-text-v1]
+    # Chat models fallbacks - Bedrock -> Gemini (imediato)
+    - claude-4-5-sonnet: [gemini-2-5-flash]
+    - claude-4-5-haiku: [gemini-2-5-flash]
+    - claude-3-5-sonnet: [gemini-2-5-flash]
+    - claude-3-opus: [gemini-2-5-flash]
+    - claude-3-sonnet: [gemini-2-5-flash]
+    - claude-3-haiku: [gemini-2-5-flash]
+    # Embedding models fallbacks - Gemini -> Bedrock
+    - text-embedding-ada-002: [titan-embed-text]
+    - text-embedding-004: [titan-embed-text]
+    - gemini-embedding-001: [titan-embed-text]
+  
+  # Fallback específico para erros de context window (limite de tokens)
+  context_window_fallbacks:
+    - claude-4-5-sonnet: [gemini-2-5-flash]
+    - claude-4-5-haiku: [gemini-2-5-flash]
+    - claude-3-5-sonnet: [gemini-2-5-flash]
+    - claude-3-opus: [gemini-2-5-flash]
+    - claude-3-sonnet: [gemini-2-5-flash]
+    - claude-3-haiku: [gemini-2-5-flash]
 
 # ============================================
 # General Settings

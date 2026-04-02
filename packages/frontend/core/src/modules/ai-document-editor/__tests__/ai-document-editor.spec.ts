@@ -1,11 +1,13 @@
 /**
  * @vitest-environment happy-dom
  */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { AIDocumentEditorService } from '../services/ai-document-editor';
+/* eslint-disable rxjs/finnish */
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import type { GraphQLService } from '../../cloud';
 import type { DocsService } from '../../doc';
 import type { WorkspaceService } from '../../workspace';
-import type { GraphQLService } from '../../cloud';
+import { AIDocumentEditorService } from '../services/ai-document-editor';
 import { DocumentContextManager } from '../services/document-context-manager';
 
 describe('AIDocumentEditorService', () => {

@@ -7,6 +7,7 @@ import { AIIsland } from '@affine/core/desktop/components/ai-island';
 import { AppContainer } from '@affine/core/desktop/components/app-container';
 import { DocumentTitle } from '@affine/core/desktop/components/document-title';
 import { WorkspaceDialogs } from '@affine/core/desktop/dialogs';
+import { DatabasePickerContainer } from '@affine/core/modules/ai-document-editor';
 import { PeekViewManagerModal } from '@affine/core/modules/peek-view';
 import { QuotaCheck } from '@affine/core/modules/quota';
 import { WorkbenchService } from '@affine/core/modules/workbench';
@@ -21,6 +22,7 @@ export const WorkspaceLayout = function WorkspaceLayout({
   return (
     <SWRConfigProvider>
       <WorkspaceDialogs />
+      <DatabasePickerContainer />
 
       {/* ---- some side-effect components ---- */}
       {currentWorkspace?.flavour !== 'local' ? (

@@ -223,7 +223,9 @@ export class OperationQueue {
   private handleOnline() {
     console.log('Network connection restored, processing queued operations');
     this.isOnline = true;
-    this.processQueue();
+    this.processQueue().catch((err: unknown) => {
+      console.error('Error processing queue:', err);
+    });
   }
 
   /**

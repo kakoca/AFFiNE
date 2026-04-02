@@ -193,7 +193,9 @@ export class DatabaseReferenceBlockComponent extends CaptionedBlockComponent<Dat
   override connectedCallback() {
     super.connectedCallback();
     this.contentEditable = 'false';
-    void this.loadSourceDatabase();
+    this.loadSourceDatabase().catch((err: unknown) => {
+      console.error('Error loading source database:', err);
+    });
   }
 
   override disconnectedCallback() {

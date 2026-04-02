@@ -1,17 +1,17 @@
-import { Service } from '@toeverything/infra';
 import type { BlockSnapshot } from '@blocksuite/store';
+import { Service } from '@toeverything/infra';
 import { nanoid } from 'nanoid';
 
 import type { DocsService } from '../../doc';
+import { DocumentEditError } from '../errors';
 import type {
   ChangePreview,
+  DeleteOperation,
   DocumentOperation,
   EditOperation,
   InsertOperation,
-  DeleteOperation,
   PreviewBlock,
 } from '../types';
-import { DocumentEditError } from '../errors';
 
 /**
  * ChangePreviewService handles preview generation and application of document changes
@@ -25,7 +25,7 @@ import { DocumentEditError } from '../errors';
  * Requirements: 7.3, 7.4
  */
 export class ChangePreviewService extends Service {
-  private previews = new Map<string, ChangePreview>();
+  private readonly previews = new Map<string, ChangePreview>();
 
   constructor(private readonly docsService: DocsService) {
     super();

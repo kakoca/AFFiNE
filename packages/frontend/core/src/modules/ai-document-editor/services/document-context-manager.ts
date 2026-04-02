@@ -2,9 +2,9 @@ import { Service } from '@toeverything/infra';
 import { combineLatest, map, Observable } from 'rxjs';
 
 import type { DocsService } from '../../doc';
+import { resolveRouteLinkMeta } from '../../navigation/utils';
 import type { WorkbenchService } from '../../workbench';
 import type { DocumentContext } from '../types';
-import { resolveRouteLinkMeta } from '../../navigation/utils';
 
 /**
  * DocumentContextManager tracks the active document and enriches it with context information

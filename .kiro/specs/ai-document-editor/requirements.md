@@ -156,3 +156,18 @@ This feature enhances AFFiNE's AI capabilities by enabling the AI assistant to d
 8. WHEN implementing error handling THEN the system SHALL extend the existing error types (UnauthorizedError, PaymentRequiredError, GeneralNetworkError)
 9. WHEN implementing services THEN the system SHALL follow the existing service architecture patterns (@toeverything/infra Service, Entity, Store)
 10. WHEN implementing GraphQL operations THEN the system SHALL extend the existing @affine/graphql mutations and queries rather than creating new communication channels
+
+### Requirement 12
+
+**User Story:** As a user, I want to use the "/" slash command menu to insert database references directly in my document, so that I can quickly reference databases from other pages without using the AI chat.
+
+#### Acceptance Criteria
+
+1. WHEN a user types "/" in the editor THEN the system SHALL display a slash command menu including a "Database Reference" option
+2. WHEN the user selects "Database Reference" from the slash menu THEN the system SHALL display a picker modal to select the source page and database
+3. WHEN the picker modal is displayed THEN the system SHALL show a searchable list of all pages containing databases in the workspace
+4. WHEN the user selects a page THEN the system SHALL display all databases available in that page with their names and view types
+5. WHEN the user selects a database THEN the system SHALL optionally allow selecting a specific view to display
+6. WHEN the user confirms the selection THEN the system SHALL insert an `affine:database-reference` block at the cursor position
+7. WHEN the database reference is inserted THEN the system SHALL display the referenced database inline with full interactivity
+8. WHEN the user cancels the picker modal THEN the system SHALL close the modal without inserting any block

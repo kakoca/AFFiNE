@@ -1,8 +1,8 @@
 import type {
   AIDocumentEditorError,
-  DocumentEditError,
-  DatabaseReferenceError,
   CommandParseError,
+  DatabaseReferenceError,
+  DocumentEditError,
 } from './errors';
 import { AIDocumentEditorErrorType } from './errors';
 

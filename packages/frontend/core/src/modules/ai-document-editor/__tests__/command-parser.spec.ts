@@ -2,8 +2,8 @@ import { describe, expect, test } from 'vitest';
 
 import { CommandParser } from '../command-parser';
 import { CommandParseError } from '../errors';
-import { CommandType } from '../types';
 import type { DocumentContext } from '../types';
+import { CommandType } from '../types';
 
 describe('CommandParser', () => {
   const mockContext: DocumentContext = {

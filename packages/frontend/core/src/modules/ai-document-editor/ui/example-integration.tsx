@@ -16,6 +16,7 @@
 
 import { toast } from '@affine/component';
 import { useCallback, useState } from 'react';
+
 import type { ChangePreview, CommandResult } from '../types';
 import { AICommandInput } from './ai-command-input';
 import { ChangePreviewDialog } from './change-preview-dialog';

@@ -7,14 +7,16 @@
  *
  * @vitest-environment happy-dom
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { AIDocumentEditorService } from '../services/ai-document-editor';
-import { DatabaseReferenceService } from '../services/database-reference';
-import { ChangePreviewService } from '../services/change-preview';
-import { DocumentContextManager } from '../services/document-context-manager';
+/* eslint-disable rxjs/finnish */
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import type { GraphQLService } from '../../cloud';
 import type { DocsService } from '../../doc';
 import type { WorkspaceService } from '../../workspace';
-import type { GraphQLService } from '../../cloud';
+import { AIDocumentEditorService } from '../services/ai-document-editor';
+import { ChangePreviewService } from '../services/change-preview';
+import { DatabaseReferenceService } from '../services/database-reference';
+import { DocumentContextManager } from '../services/document-context-manager';
 
 describe('Integration Tests: AI Document Editor', () => {
   let aiService: AIDocumentEditorService;

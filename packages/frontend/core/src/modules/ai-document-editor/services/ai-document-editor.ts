@@ -1,25 +1,25 @@
-import { Service } from '@toeverything/infra';
-import { insertPositionToIndex } from '@blocksuite/affine-shared/utils';
 import { DatabaseBlockDataSource } from '@blocksuite/affine/blocks/database';
 import type { DatabaseBlockModel } from '@blocksuite/affine/model';
+import { insertPositionToIndex } from '@blocksuite/affine-shared/utils';
+import { Service } from '@toeverything/infra';
 
+import { CopilotClient } from '../../../blocksuite/ai/provider/copilot-client';
+import type { GraphQLService } from '../../cloud';
 import type { DocsService } from '../../doc';
 import type { WorkspaceService } from '../../workspace';
-import type { GraphQLService } from '../../cloud';
-import { CopilotClient } from '../../../blocksuite/ai/provider/copilot-client';
 import { CommandParser } from '../command-parser';
-import { DocumentContextManager } from './document-context-manager';
 import { DocumentEditError } from '../errors';
 import type {
+  BlockContent,
   CommandOptions,
   CommandResult,
-  EditResult,
-  BlockContent,
-  DocumentContext,
   DatabaseConfig,
+  DocumentContext,
+  EditResult,
   RowData,
 } from '../types';
 import { CommandType } from '../types';
+import { DocumentContextManager } from './document-context-manager';
 
 /**
  * AIDocumentEditorService is the primary service for handling AI-driven document editing operations.

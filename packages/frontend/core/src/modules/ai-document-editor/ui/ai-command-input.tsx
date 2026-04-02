@@ -1,6 +1,7 @@
 import { Input } from '@affine/component';
 import { useService } from '@toeverything/infra';
 import { useCallback, useState } from 'react';
+
 import { AIDocumentEditorService } from '../services/ai-document-editor';
 import type { CommandResult } from '../types';
 import * as styles from './ai-command-input.css';
@@ -74,14 +75,23 @@ export const AICommandInput = ({
       // Submit on Enter (without Shift)
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
-        handleSubmit(e as any);
+        handleSubmit(e as any).catch((err: unknown) => {
+          console.error('Error in handleKeyDown:', err);
+        });
       }
     },
     [handleSubmit]
   );
 
   return (
-    <form onSubmit={handleSubmit} className={className}>
+    <form
+      onSubmit={e => {
+        handleSubmit(e).catch((err: unknown) => {
+          console.error('Error in form submit:', err);
+        });
+      }}
+      className={className}
+    >
       <div className={styles.inputContainer}>
         <Input
           value={command}

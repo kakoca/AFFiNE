@@ -318,3 +318,80 @@
     - Document service APIs
     - Provide integration examples
     - Document extension points for future features
+
+- [x] 19. Implement Slash Command for Database References
+  - [x] 19.1 Create SlashCommandHandler for database reference
+    - Create `packages/frontend/core/src/modules/ai-document-editor/slash-commands/database-reference-command.ts`
+    - Define slash menu item with name "Database Reference", icon, and description
+    - Implement `showWhen` to display in note blocks
+    - Implement `action` to open database picker modal
+    - _Requirements: 12.1_
+
+  - [x] 19.2 Create DatabasePickerModal component
+    - Create `packages/frontend/core/src/modules/ai-document-editor/ui/database-picker-modal.tsx`
+    - Implement searchable list of pages with databases
+    - Group databases by source document
+    - Show database name and available view types
+    - Implement view selector dropdown (optional)
+    - Add Cancel and Insert buttons
+    - _Requirements: 12.2, 12.3, 12.4, 12.5_
+
+  - [x] 19.3 Implement workspace database scanner
+    - Create utility to scan all docs in workspace for databases
+    - Extract database metadata (name, views, doc title)
+    - Cache results for performance
+    - _Requirements: 12.3, 12.4_
+
+  - [x] 19.4 Implement database reference insertion from slash command
+    - Use DatabaseReferenceService.createReference() on selection
+    - Insert block at current cursor position
+    - Handle view-specific references when viewId is selected
+    - _Requirements: 12.6, 12.7_
+
+  - [x] 19.5 Implement modal cancellation handling
+    - Close modal without side effects on Cancel click
+    - Close modal on Escape key press
+    - Close modal on click outside
+    - _Requirements: 12.8_
+
+  - [x] 19.6 Register slash command in module configuration
+    - Add databaseReferenceSlashItem to SlashMenuConfig
+    - Ensure proper ordering in slash menu (under "Content" group)
+    - _Requirements: 12.1_
+
+  - [x] 19.7 Create CSS styles for DatabasePickerModal
+    - Create `packages/frontend/core/src/modules/ai-document-editor/ui/database-picker-modal.css.ts`
+    - Style search input, database list, view selector
+    - Style selected state and hover states
+    - Follow AFFiNE design system patterns
+    - _Requirements: 11.7_
+
+  - [x] 19.8 Write property test for slash menu option
+    - **Property 26: Slash menu shows Database Reference option**
+    - **Validates: Requirements 12.1**
+
+  - [x]\* 19.9 Write property test for database picker completeness
+    - **Property 27: Database picker shows all workspace databases**
+    - **Validates: Requirements 12.3, 12.4**
+
+  - [x]\* 19.10 Write property test for insertion position
+    - **Property 28: Database reference insertion at cursor position**
+    - **Validates: Requirements 12.6**
+
+  - [x]\* 19.11 Write property test for cancellation
+    - **Property 29: Picker modal cancellation has no side effects**
+    - **Validates: Requirements 12.8**
+
+- [x] 20. Final integration testing for slash command
+  - [x] 20.1 Test slash command end-to-end flow
+    - Test typing "/" shows Database Reference option
+    - Test selecting option opens picker modal
+    - Test searching filters databases correctly
+    - Test selecting database and inserting reference
+    - Test cancellation leaves document unchanged
+
+  - [x] 20.2 Test edge cases
+    - Test with workspace containing no databases
+    - Test with databases that have no views
+    - Test with very long database/page names
+    - Test with special characters in names

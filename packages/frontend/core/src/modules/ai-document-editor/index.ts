@@ -99,5 +99,36 @@ export { DatabaseReferenceService } from './services/database-reference';
 export { DocumentContextManager } from './services/document-context-manager';
 
 // Export UI components
-export type { AICommandInputProps, ChangePreviewDialogProps } from './ui';
-export { AICommandInput, ChangePreviewDialog } from './ui';
+export type {
+  AICommandInputProps,
+  ChangePreviewDialogProps,
+  DatabasePickerModalProps,
+} from './ui';
+export {
+  AICommandInput,
+  ChangePreviewDialog,
+  DatabasePickerContainer,
+  DatabasePickerModal,
+} from './ui';
+
+// Export slash commands
+export {
+  type DatabasePickerOpenEventDetail,
+  databaseReferenceSlashItem,
+  databaseReferenceSlashMenuConfig,
+} from './slash-commands';
+
+// Export extensions
+export {
+  DatabaseReferenceSlashMenuExtension,
+  getDatabaseReferenceSlashMenuExtension,
+} from './extensions';
+
+// Export utilities
+export {
+  createWorkspaceDatabaseScanner,
+  type DatabaseViewInfo,
+  type DocWithDatabases,
+  type DatabaseInfo as WorkspaceDatabaseInfo,
+  WorkspaceDatabaseScanner,
+} from './utils';

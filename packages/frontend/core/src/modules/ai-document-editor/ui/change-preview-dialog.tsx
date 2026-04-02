@@ -1,6 +1,7 @@
 import { Button, Modal, Scrollable } from '@affine/component';
 import { useService } from '@toeverything/infra';
 import { useCallback, useState } from 'react';
+
 import { ChangePreviewService } from '../services/change-preview';
 import type { ChangePreview, PreviewBlock } from '../types';
 import * as styles from './change-preview-dialog.css';
@@ -141,7 +142,11 @@ export const ChangePreviewDialog = ({
       {/* Action buttons */}
       <div className={styles.actions}>
         <Button
-          onClick={handleReject}
+          onClick={() => {
+            handleReject().catch((err: unknown) => {
+              console.error('Error in handleReject:', err);
+            });
+          }}
           disabled={isApplying}
           variant="secondary"
           data-testid="preview-reject-button"
@@ -159,7 +164,11 @@ export const ChangePreviewDialog = ({
           </Button>
         )}
         <Button
-          onClick={handleApprove}
+          onClick={() => {
+            handleApprove().catch((err: unknown) => {
+              console.error('Error in handleApprove:', err);
+            });
+          }}
           disabled={isApplying}
           variant="primary"
           data-testid="preview-approve-button"

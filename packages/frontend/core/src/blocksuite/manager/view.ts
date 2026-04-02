@@ -4,6 +4,7 @@ import { CloudViewExtension } from '@affine/core/blocksuite/view-extensions/clou
 import { CodeBlockPreviewViewExtension } from '@affine/core/blocksuite/view-extensions/code-block-preview';
 import { CommentViewExtension } from '@affine/core/blocksuite/view-extensions/comment';
 import { AffineDatabaseViewExtension } from '@affine/core/blocksuite/view-extensions/database';
+import { DatabaseReferenceViewExtension } from '@affine/core/blocksuite/view-extensions/database-reference';
 import {
   EdgelessBlockHeaderConfigViewExtension,
   type EdgelessBlockHeaderViewOptions,
@@ -49,6 +50,7 @@ type Configure = {
   editorConfig: (framework?: FrameworkProvider) => Configure;
   edgelessBlockHeader: (options?: EdgelessBlockHeaderViewOptions) => Configure;
   database: (framework?: FrameworkProvider) => Configure;
+  databaseReference: (framework?: FrameworkProvider) => Configure;
   linkedDoc: (framework?: FrameworkProvider) => Configure;
   paragraph: (enableAI?: boolean) => Configure;
   cloud: (framework?: FrameworkProvider, enableCloud?: boolean) => Configure;
@@ -99,6 +101,7 @@ class ViewProvider {
       ElectronViewExtension,
       AffineLinkPreviewExtension,
       AffineDatabaseViewExtension,
+      DatabaseReferenceViewExtension,
       CommentViewExtension,
     ]);
   }
@@ -116,6 +119,7 @@ class ViewProvider {
       editorConfig: this._configureEditorConfig,
       edgelessBlockHeader: this._configureEdgelessBlockHeader,
       database: this._configureDatabase,
+      databaseReference: this._configureDatabaseReference,
       linkedDoc: this._configureLinkedDoc,
       paragraph: this._configureParagraph,
       cloud: this._configureCloud,
@@ -140,6 +144,7 @@ class ViewProvider {
       .editorConfig()
       .edgelessBlockHeader()
       .database()
+      .databaseReference()
       .linkedDoc()
       .paragraph()
       .cloud()
@@ -230,6 +235,13 @@ class ViewProvider {
         createDatabaseOptionsConfig(framework)
       );
     }
+    return this.config;
+  };
+
+  private readonly _configureDatabaseReference = (
+    framework?: FrameworkProvider
+  ) => {
+    this._manager.configure(DatabaseReferenceViewExtension, { framework });
     return this.config;
   };
 
