@@ -150,7 +150,7 @@ export class ServerConfigResolver {
       return {
         version: latest.name,
         url: latest.url,
-        changelog: latest.body,
+        changelog: latest.body ?? '',
         publishedAt: new Date(latest.published_at),
       };
     } catch (e) {
