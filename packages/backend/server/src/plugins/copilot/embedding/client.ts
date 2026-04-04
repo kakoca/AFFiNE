@@ -31,14 +31,11 @@ class ProductionEmbeddingClient extends EmbeddingClient {
   }
 
   override async configured(): Promise<boolean> {
-    const modelId = this.config.copilot?.scenarios?.override_enabled
-      ? this.config.copilot.scenarios.scenarios?.embedding || EMBEDDING_MODEL
-      : EMBEDDING_MODEL;
-    
+    const modelId = this.getEmbeddingModelId();
     this.logger.debug(
       `Checking embedding configuration: override_enabled=${this.config.copilot?.scenarios?.override_enabled}, modelId=${modelId}`
     );
-    
+
     const embedding = await this.providerFactory.getProvider({
       modelId,
       outputType: ModelOutputType.Embedding,
@@ -76,14 +73,11 @@ class ProductionEmbeddingClient extends EmbeddingClient {
   }
 
   async getEmbeddings(input: string[]): Promise<Embedding[]> {
-    const modelId = this.config.copilot?.scenarios?.override_enabled
-      ? this.config.copilot.scenarios.scenarios?.embedding || EMBEDDING_MODEL
-      : EMBEDDING_MODEL;
-    
+    const modelId = this.getEmbeddingModelId();
     this.logger.debug(
       `Getting embeddings with model: ${modelId}, override_enabled=${this.config.copilot?.scenarios?.override_enabled}`
     );
-    
+
     const provider = await this.getProvider({
       modelId,
       outputType: ModelOutputType.Embedding,

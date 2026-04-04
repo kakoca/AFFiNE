@@ -18,7 +18,7 @@ import type {
   PromptMessage,
   StreamObject,
 } from '../types';
-import { CopilotProviderType, ModelOutputType } from '../types';
+import { CopilotProviderType, ModelInputType, ModelOutputType } from '../types';
 import {
   getGoogleAuth,
   getVertexAnthropicBaseUrl,
@@ -26,10 +26,6 @@ import {
 } from '../utils';
 
 export abstract class AnthropicProvider<T> extends CopilotProvider<T> {
-  protected abstract instance:
-    | AnthropicSDKProvider
-    | GoogleVertexAnthropicProvider;
-  
   protected abstract getBaseURL(): string;
   protected abstract getApiKey(): string;
 

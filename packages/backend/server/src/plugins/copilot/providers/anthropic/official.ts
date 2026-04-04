@@ -64,8 +64,6 @@ export class AnthropicOfficialProvider extends AnthropicProvider<AnthropicOffici
     },
   ];
 
-  protected instance!: AnthropicSDKProvider;
-
   protected getBaseURL(): string {
     return this.config.baseURL || 'https://api.anthropic.com/v1';
   }

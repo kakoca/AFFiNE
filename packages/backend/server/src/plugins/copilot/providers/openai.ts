@@ -524,25 +524,23 @@ export class OpenAIProvider extends CopilotProvider<OpenAIConfig> {
     const model = this.selectModel(normalizedCond);
 
     try {
-      metrics.ai.counter('chat_text_calls').add(1, { model: model.id });
-
-      const [system, msgs] = await chatToGPTMessage(messages);
-
-      // Force use of chat API instead of responses API for better LiteLLM compatibility
-      const modelInstance = this.#instance(model.id);
-
-      const { text } = await generateText({
-        model: modelInstance,
-        system,
-        messages: msgs,
-        temperature: options.temperature ?? 0,
-        maxOutputTokens: options.maxTokens ?? 4096,
-        providerOptions: {
-          openai: this.getOpenAIOptions(options, model.id),
-        },
-        tools: await this.getTools(options, model.id),
-        stopWhen: stepCountIs(this.MAX_STEPS),
-        abortSignal: options.signal,
+      metrics.ai.counter('chat_text_calls').add(1, this.metricLabels(model.id));
+      const tools = await this.getTools(options, model.id);
+      const middleware = this.getActiveProviderMiddleware();
+      const cap = this.getAttachCapability(model, ModelOutputType.Text);
+      const normalizedOptions = normalizeOpenAIOptionsForModel(
+        options,
+        model.id
+      );
+      const { request } = await buildNativeRequest({
+        model: model.id,
+        messages,
+        options: normalizedOptions,
+        tools,
+        attachmentCapability: cap,
+        include: options.webSearch ? ['citations'] : undefined,
+        reasoning: this.getReasoning(options, model.id),
+        middleware,
       });
       const adapter = this.createNativeAdapter(tools, middleware.node?.text);
       return await adapter.text(request, options.signal, messages);
@@ -671,28 +669,22 @@ export class OpenAIProvider extends CopilotProvider<OpenAIConfig> {
     const model = this.selectModel(normalizedCond);
 
     try {
-      metrics.ai.counter('chat_text_calls').add(1, { model: model.id });
-
-      const [system, msgs, schema] = await chatToGPTMessage(messages);
-      if (!schema) {
-        throw new CopilotPromptInvalid('Schema is required');
-      }
-
-      // Force use of chat API instead of responses API for better LiteLLM compatibility
-      const modelInstance = this.#instance(model.id);
-
-      const { object } = await generateObject({
-        model: modelInstance,
-        system,
-        messages: msgs,
-        temperature: options.temperature ?? 0,
-        maxOutputTokens: options.maxTokens ?? 4096,
-        maxRetries: options.maxRetries ?? 3,
-        schema,
-        providerOptions: {
-          openai: options.user ? { user: options.user } : {},
-        },
-        abortSignal: options.signal,
+      metrics.ai.counter('chat_text_calls').add(1, this.metricLabels(model.id));
+      const backendConfig = this.createNativeConfig();
+      const middleware = this.getActiveProviderMiddleware();
+      const cap = this.getAttachCapability(model, ModelOutputType.Structured);
+      const normalizedOptions = normalizeOpenAIOptionsForModel(
+        options,
+        model.id
+      );
+      const { request, schema } = await buildNativeStructuredRequest({
+        model: model.id,
+        messages,
+        options: normalizedOptions,
+        attachmentCapability: cap,
+        reasoning: this.getReasoning(options, model.id),
+        responseSchema: options.schema,
+        middleware,
       });
       const response =
         await this.createNativeStructuredDispatch(backendConfig)(request);
@@ -1050,19 +1042,16 @@ export class OpenAIProvider extends CopilotProvider<OpenAIConfig> {
   ): Promise<number[][]> {
     const input = Array.isArray(messages) ? messages : [messages];
     const fullCond = { ...cond, outputType: ModelOutputType.Embedding };
-    await this.checkParams({ embeddings: messages, cond: fullCond, options });
-    const model = this.selectModel(fullCond);
+    const normalizedCond = await this.checkParams({
+      embeddings: input,
+      cond: fullCond,
+      options,
+    });
+    const model = this.selectModel(normalizedCond);
 
     this.logger.debug(
       `Embedding: requested modelId=${cond.modelId}, selected model=${model.id}`
     );
-
-    if (!('embedding' in this.#instance)) {
-      throw new CopilotProviderNotSupported({
-        provider: this.type,
-        kind: 'embedding',
-      });
-    }
 
     try {
       metrics.ai
