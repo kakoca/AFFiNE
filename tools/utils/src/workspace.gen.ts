@@ -1181,6 +1181,7 @@ export const PackageList = [
     location: 'packages/backend/server',
     name: '@affine/server',
     workspaceDependencies: [
+      'packages/common/s3-compat',
       'packages/backend/native',
       'tools/cli',
       'tools/utils',
@@ -1238,8 +1239,8 @@ export const PackageList = [
     workspaceDependencies: ['blocksuite/affine/all'],
   },
   {
-    location: 'packages/common/y-octo/node',
-    name: '@y-octo/node',
+    location: 'packages/common/s3-compat',
+    name: '@affine/s3-compat',
     workspaceDependencies: [],
   },
   {
@@ -1262,7 +1263,9 @@ export const PackageList = [
       'packages/frontend/core',
       'packages/common/env',
       'packages/frontend/i18n',
+      'packages/frontend/apps/mobile-shared',
       'packages/common/nbstore',
+      'packages/frontend/track',
       'blocksuite/affine/all',
       'packages/common/infra',
     ],
@@ -1303,7 +1306,9 @@ export const PackageList = [
       'packages/common/env',
       'packages/common/graphql',
       'packages/frontend/i18n',
+      'packages/frontend/apps/mobile-shared',
       'packages/common/nbstore',
+      'packages/frontend/track',
       'blocksuite/affine/all',
       'packages/common/infra',
       'tools/cli',
@@ -1320,9 +1325,15 @@ export const PackageList = [
       'packages/common/env',
       'packages/frontend/i18n',
       'packages/common/nbstore',
+      'packages/frontend/track',
       'blocksuite/affine/all',
       'packages/common/infra',
     ],
+  },
+  {
+    location: 'packages/frontend/apps/mobile-shared',
+    name: '@affine/mobile-shared',
+    workspaceDependencies: ['packages/frontend/core'],
   },
   {
     location: 'packages/frontend/apps/web',
@@ -1448,6 +1459,7 @@ export const PackageList = [
     location: 'tests/blocksuite',
     name: '@affine-test/blocksuite',
     workspaceDependencies: [
+      'tests/kit',
       'blocksuite/affine/all',
       'blocksuite/integration-test',
     ],
@@ -1479,7 +1491,7 @@ export const PackageList = [
   {
     location: 'tools/cli',
     name: '@affine-tools/cli',
-    workspaceDependencies: ['tools/utils'],
+    workspaceDependencies: ['tools/utils', 'packages/common/s3-compat'],
   },
   {
     location: 'tools/commitlint',
@@ -1492,9 +1504,19 @@ export const PackageList = [
     workspaceDependencies: [],
   },
   {
+    location: 'tools/doc-diff',
+    name: '@affine/doc-diff',
+    workspaceDependencies: ['tools/cli'],
+  },
+  {
     location: 'tools/playstore-auto-bump',
     name: '@affine/playstore-auto-bump',
     workspaceDependencies: ['tools/cli', 'tools/utils'],
+  },
+  {
+    location: 'tools/revert-update',
+    name: '@affine/revert-update',
+    workspaceDependencies: ['tools/cli'],
   },
   {
     location: 'tools/utils',
@@ -1588,13 +1610,14 @@ export type PackageName =
   | '@toeverything/infra'
   | '@affine/nbstore'
   | '@affine/reader'
-  | '@y-octo/node'
+  | '@affine/s3-compat'
   | '@affine/admin'
   | '@affine/android'
   | '@affine/electron'
   | '@affine/electron-renderer'
   | '@affine/ios'
   | '@affine/mobile'
+  | '@affine/mobile-shared'
   | '@affine/web'
   | '@affine/component'
   | '@affine/core'
@@ -1619,5 +1642,7 @@ export type PackageName =
   | '@affine-tools/cli'
   | '@affine/commitlint-config'
   | '@affine/copilot-result'
+  | '@affine/doc-diff'
   | '@affine/playstore-auto-bump'
+  | '@affine/revert-update'
   | '@affine-tools/utils';

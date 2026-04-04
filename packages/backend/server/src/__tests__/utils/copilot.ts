@@ -250,7 +250,6 @@ export async function listContext(
 export async function addContextFile(
   app: TestingApp,
   contextId: string,
-  blobId: string,
   fileName: string,
   content: Buffer
 ): Promise<{ id: string }> {
@@ -269,7 +268,7 @@ export async function addContextFile(
         `,
         variables: {
           content: null,
-          options: { contextId, blobId },
+          options: { contextId },
         },
       })
     )
@@ -396,7 +395,8 @@ export async function submitAudioTranscription(
   workspaceId: string,
   blobId: string,
   fileName: string,
-  content: Buffer[]
+  content: Buffer[],
+  input?: Record<string, unknown>
 ): Promise<{ id: string; status: string }> {
   let resp = app
     .POST('/graphql')
@@ -405,8 +405,8 @@ export async function submitAudioTranscription(
       'operations',
       JSON.stringify({
         query: `
-          mutation submitAudioTranscription($blob: Upload, $blobs: [Upload!], $blobId: String!, $workspaceId: String!) {
-            submitAudioTranscription(blob: $blob, blobs: $blobs, blobId: $blobId, workspaceId: $workspaceId) {
+          mutation submitAudioTranscription($blob: Upload, $blobs: [Upload!], $blobId: String!, $workspaceId: String!, $input: SubmitAudioTranscriptionInput) {
+            submitAudioTranscription(blob: $blob, blobs: $blobs, blobId: $blobId, workspaceId: $workspaceId, input: $input) {
               id
               status
             }
@@ -417,6 +417,7 @@ export async function submitAudioTranscription(
           blobs: [],
           blobId,
           workspaceId,
+          input: input ?? null,
         },
       })
     )
@@ -470,13 +471,44 @@ export async function claimAudioTranscription(
   title: string | null;
   summary: string | null;
   actions: string | null;
-  transcription:
+  sourceAudio: {
+    blobId: string | null;
+    mimeType: string | null;
+    durationMs: number | null;
+    sampleRate: number | null;
+    channels: number | null;
+  } | null;
+  quality: {
+    degraded: boolean | null;
+    overflowCount: number | null;
+  } | null;
+  normalizedTranscript: string | null;
+  summaryJson: {
+    title: string;
+    durationMinutes: number;
+    attendees: string[];
+    keyPoints: string[];
+    actionItems: {
+      description: string;
+      owner: string | null;
+      deadline: string | null;
+    }[];
+    decisions: string[];
+    openQuestions: string[];
+    blockers: string[];
+  } | null;
+  normalizedSegments:
     | {
         speaker: string;
-        start: number;
-        end: number;
-        transcription: string;
+        startSec: number;
+        endSec: number;
+        start: string;
+        end: string;
+        text: string;
       }[]
+    | null;
+  transcription:
+    | { speaker: string; start: string; end: string; transcription: string }[]
     | null;
 }> {
   const res = await app.gql(
@@ -488,6 +520,40 @@ export async function claimAudioTranscription(
           title
           summary
           actions
+          sourceAudio {
+            blobId
+            mimeType
+            durationMs
+            sampleRate
+            channels
+          }
+          quality {
+            degraded
+            overflowCount
+          }
+          normalizedTranscript
+          summaryJson {
+            title
+            durationMinutes
+            attendees
+            keyPoints
+            actionItems {
+              description
+              owner
+              deadline
+            }
+            decisions
+            openQuestions
+            blockers
+          }
+          normalizedSegments {
+            speaker
+            startSec
+            endSec
+            start
+            end
+            text
+          }
           transcription {
             speaker
             start
@@ -512,11 +578,47 @@ export async function audioTranscription(
   status: string;
   title: string | null;
   summary: string | null;
+  sourceAudio: {
+    blobId: string | null;
+    mimeType: string | null;
+    durationMs: number | null;
+    sampleRate: number | null;
+    channels: number | null;
+  } | null;
+  quality: {
+    degraded: boolean | null;
+    overflowCount: number | null;
+  } | null;
+  normalizedTranscript: string | null;
+  summaryJson: {
+    title: string;
+    durationMinutes: number;
+    attendees: string[];
+    keyPoints: string[];
+    actionItems: {
+      description: string;
+      owner: string | null;
+      deadline: string | null;
+    }[];
+    decisions: string[];
+    openQuestions: string[];
+    blockers: string[];
+  } | null;
+  normalizedSegments:
+    | {
+        speaker: string;
+        startSec: number;
+        endSec: number;
+        start: string;
+        end: string;
+        text: string;
+      }[]
+    | null;
   transcription:
     | {
         speaker: string;
-        start: number;
-        end: number;
+        start: string;
+        end: string;
         transcription: string;
       }[]
     | null;
@@ -531,6 +633,40 @@ export async function audioTranscription(
               status
               title
               summary
+              sourceAudio {
+                blobId
+                mimeType
+                durationMs
+                sampleRate
+                channels
+              }
+              quality {
+                degraded
+                overflowCount
+              }
+              normalizedTranscript
+              summaryJson {
+                title
+                durationMinutes
+                attendees
+                keyPoints
+                actionItems {
+                  description
+                  owner
+                  deadline
+                }
+                decisions
+                openQuestions
+                blockers
+              }
+              normalizedSegments {
+                speaker
+                startSec
+                endSec
+                start
+                end
+                text
+              }
               transcription {
                 speaker
                 start
@@ -630,14 +766,35 @@ export async function chatWithText(
   prefix = '',
   retry?: boolean
 ): Promise<string> {
+  const endpoint = prefix || '/stream';
   const query = messageId
     ? `?messageId=${messageId}` + (retry ? '&retry=true' : '')
     : '';
   const res = await app
-    .GET(`/api/copilot/chat/${sessionId}${prefix}${query}`)
+    .GET(`/api/copilot/chat/${sessionId}${endpoint}${query}`)
     .expect(200);
 
-  return res.text;
+  if (prefix) {
+    return res.text;
+  }
+
+  const events = sse2array(res.text);
+  const errorEvent = events.find(event => event.event === 'error');
+  if (errorEvent?.data) {
+    let message = errorEvent.data;
+    try {
+      const parsed = JSON.parse(errorEvent.data);
+      message = parsed.message || message;
+    } catch {
+      // noop: keep raw error data
+    }
+    throw new Error(message);
+  }
+
+  return events
+    .filter(event => event.event === 'message')
+    .map(event => event.data ?? '')
+    .join('');
 }
 
 export async function chatWithTextStream(

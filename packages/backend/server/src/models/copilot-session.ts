@@ -10,6 +10,7 @@ import {
   CopilotSessionNotFound,
 } from '../base';
 import { getTokenEncoder } from '../native';
+import type { PromptAttachment } from '../plugins/copilot/providers/types';
 import { BaseModel } from './base';
 
 export enum SessionType {
@@ -24,7 +25,7 @@ type ChatPrompt = {
   model: string;
 };
 
-type ChatAttachment = { attachment: string; mimeType: string } | string;
+type ChatAttachment = PromptAttachment;
 
 type ChatStreamObject = {
   type: 'text-delta' | 'reasoning' | 'tool-call' | 'tool-result';
@@ -113,6 +114,182 @@ export type CleanupSessionOptions = Pick<
 
 @Injectable()
 export class CopilotSessionModel extends BaseModel {
+  private sanitizeString<T extends string | null | undefined>(value: T): T {
+    if (typeof value !== 'string') {
+      return value;
+    }
+    return value.replaceAll('\0', '') as T;
+  }
+
+  private sanitizeJsonValue<T>(value: T): T {
+    if (typeof value === 'string') {
+      return this.sanitizeString(value) as T;
+    }
+    if (Array.isArray(value)) {
+      return value.map(v => this.sanitizeJsonValue(v)) as T;
+    }
+    if (
+      value &&
+      typeof value === 'object' &&
+      Object.getPrototypeOf(value) === Object.prototype
+    ) {
+      return Object.fromEntries(
+        Object.entries(value).map(([k, v]) => [k, this.sanitizeJsonValue(v)])
+      ) as T;
+    }
+    return value;
+  }
+
+  private sanitizeStreamObject(stream: ChatStreamObject): ChatStreamObject {
+    switch (stream.type) {
+      case 'text-delta':
+      case 'reasoning':
+        return {
+          ...stream,
+          textDelta: this.sanitizeString(stream.textDelta),
+        };
+      case 'tool-call':
+        return {
+          ...stream,
+          toolCallId: this.sanitizeString(stream.toolCallId) ?? '',
+          toolName: this.sanitizeString(stream.toolName) ?? '',
+          args: this.sanitizeJsonValue(stream.args),
+        };
+      case 'tool-result':
+        return {
+          ...stream,
+          toolCallId: this.sanitizeString(stream.toolCallId) ?? '',
+          toolName: this.sanitizeString(stream.toolName) ?? '',
+          args: this.sanitizeJsonValue(stream.args),
+          result: this.sanitizeJsonValue(stream.result),
+        };
+    }
+  }
+
+  private sanitizeAttachments(
+    attachments?: ChatAttachment[] | null
+  ): ChatAttachment[] | undefined {
+    if (!attachments?.length) {
+      return undefined;
+    }
+
+    return attachments
+      .map(attachment => {
+        if (typeof attachment === 'string') {
+          return this.sanitizeString(attachment) ?? '';
+        }
+
+        if ('attachment' in attachment) {
+          return {
+            attachment:
+              this.sanitizeString(attachment.attachment) ??
+              attachment.attachment,
+            mimeType:
+              this.sanitizeString(attachment.mimeType) ?? attachment.mimeType,
+          };
+        }
+
+        switch (attachment.kind) {
+          case 'url':
+            return {
+              ...attachment,
+              url: this.sanitizeString(attachment.url) ?? attachment.url,
+              mimeType:
+                this.sanitizeString(attachment.mimeType) ?? attachment.mimeType,
+              fileName:
+                this.sanitizeString(attachment.fileName) ?? attachment.fileName,
+              providerHint: attachment.providerHint
+                ? {
+                    provider:
+                      this.sanitizeString(attachment.providerHint.provider) ??
+                      attachment.providerHint.provider,
+                    kind:
+                      this.sanitizeString(attachment.providerHint.kind) ??
+                      attachment.providerHint.kind,
+                  }
+                : undefined,
+            };
+          case 'data':
+          case 'bytes':
+            return {
+              ...attachment,
+              data: this.sanitizeString(attachment.data) ?? attachment.data,
+              mimeType:
+                this.sanitizeString(attachment.mimeType) ?? attachment.mimeType,
+              fileName:
+                this.sanitizeString(attachment.fileName) ?? attachment.fileName,
+              providerHint: attachment.providerHint
+                ? {
+                    provider:
+                      this.sanitizeString(attachment.providerHint.provider) ??
+                      attachment.providerHint.provider,
+                    kind:
+                      this.sanitizeString(attachment.providerHint.kind) ??
+                      attachment.providerHint.kind,
+                  }
+                : undefined,
+            };
+          case 'file_handle':
+            return {
+              ...attachment,
+              fileHandle:
+                this.sanitizeString(attachment.fileHandle) ??
+                attachment.fileHandle,
+              mimeType:
+                this.sanitizeString(attachment.mimeType) ?? attachment.mimeType,
+              fileName:
+                this.sanitizeString(attachment.fileName) ?? attachment.fileName,
+              providerHint: attachment.providerHint
+                ? {
+                    provider:
+                      this.sanitizeString(attachment.providerHint.provider) ??
+                      attachment.providerHint.provider,
+                    kind:
+                      this.sanitizeString(attachment.providerHint.kind) ??
+                      attachment.providerHint.kind,
+                  }
+                : undefined,
+            };
+        }
+
+        return attachment;
+      })
+      .filter(attachment => {
+        if (typeof attachment === 'string') {
+          return !!attachment;
+        }
+        if ('attachment' in attachment) {
+          return !!attachment.attachment && !!attachment.mimeType;
+        }
+
+        switch (attachment.kind) {
+          case 'url':
+            return !!attachment.url;
+          case 'data':
+          case 'bytes':
+            return !!attachment.data && !!attachment.mimeType;
+          case 'file_handle':
+            return !!attachment.fileHandle;
+        }
+
+        return false;
+      });
+  }
+
+  private sanitizeMessage(message: ChatMessage): ChatMessage {
+    return {
+      ...message,
+      content: this.sanitizeString(message.content) ?? '',
+      attachments: this.sanitizeAttachments(message.attachments),
+      params: this.sanitizeJsonValue(
+        omit(message.params, ['docs']) || undefined
+      ),
+      streamObjects: message.streamObjects?.map(o =>
+        this.sanitizeStreamObject(o)
+      ),
+    };
+  }
+
   getSessionType(session: Pick<ChatSession, 'docId' | 'pinned'>): SessionType {
     if (session.pinned) return SessionType.Pinned;
     if (!session.docId) return SessionType.Workspace;
@@ -401,6 +578,7 @@ export class CopilotSessionModel extends BaseModel {
     internalCall = false
   ): Promise<string> {
     const { userId, sessionId, docId, promptName, pinned, title } = options;
+    const sanitizedTitle = this.sanitizeString(title);
     const session = await this.getExists(
       sessionId,
       {
@@ -448,7 +626,7 @@ export class CopilotSessionModel extends BaseModel {
 
     await this.db.aiSession.update({
       where: { id: sessionId },
-      data: { docId, promptName, pinned, title },
+      data: { docId, promptName, pinned, title: sanitizedTitle },
     });
 
     return sessionId;
@@ -509,19 +687,23 @@ export class CopilotSessionModel extends BaseModel {
     }
 
     if (messages.length) {
-      const tokenCost = this.calculateTokenSize(messages, state.prompt.model);
+      const sanitizedMessages = messages.map(m => this.sanitizeMessage(m));
+      const tokenCost = this.calculateTokenSize(
+        sanitizedMessages,
+        state.prompt.model
+      );
       await this.db.aiSessionMessage.createMany({
-        data: messages.map(m => ({
+        data: sanitizedMessages.map(m => ({
           ...m,
           attachments: m.attachments || undefined,
-          params: omit(m.params, ['docs']) || undefined,
+          params: m.params || undefined,
           streamObjects: m.streamObjects || undefined,
           sessionId,
         })),
       });
 
       // only count message generated by user
-      const userMessages = messages.filter(m => m.role === 'user');
+      const userMessages = sanitizedMessages.filter(m => m.role === 'user');
       await this.db.aiSession.update({
         where: { id: sessionId },
         data: {

@@ -1,9 +1,6 @@
-import {
-  type AnthropicProvider as AnthropicSDKProvider,
-  createAnthropic,
-} from '@ai-sdk/anthropic';
 import z from 'zod';
 
+import { IMAGE_ATTACHMENT_CAPABILITY } from '../attachments';
 import { CopilotProviderType, ModelInputType, ModelOutputType } from '../types';
 import { AnthropicProvider } from './anthropic';
 
@@ -27,6 +24,7 @@ export class AnthropicOfficialProvider extends AnthropicProvider<AnthropicOffici
         {
           input: [ModelInputType.Text, ModelInputType.Image],
           output: [ModelOutputType.Text, ModelOutputType.Object],
+          attachments: IMAGE_ATTACHMENT_CAPABILITY,
         },
       ],
     },
@@ -37,6 +35,7 @@ export class AnthropicOfficialProvider extends AnthropicProvider<AnthropicOffici
         {
           input: [ModelInputType.Text, ModelInputType.Image],
           output: [ModelOutputType.Text, ModelOutputType.Object],
+          attachments: IMAGE_ATTACHMENT_CAPABILITY,
         },
       ],
     },
@@ -47,6 +46,7 @@ export class AnthropicOfficialProvider extends AnthropicProvider<AnthropicOffici
         {
           input: [ModelInputType.Text, ModelInputType.Image],
           output: [ModelOutputType.Text, ModelOutputType.Object],
+          attachments: IMAGE_ATTACHMENT_CAPABILITY,
         },
       ],
     },
@@ -80,10 +80,6 @@ export class AnthropicOfficialProvider extends AnthropicProvider<AnthropicOffici
 
   override setup() {
     super.setup();
-    this.instance = createAnthropic({
-      apiKey: this.config.apiKey,
-      baseURL: this.config.baseURL,
-    });
   }
 
   override async refreshOnlineModels() {

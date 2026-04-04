@@ -17,6 +17,7 @@ import {
   SubscriptionService,
   ValidatorProvider,
 } from '@affine/core/modules/cloud';
+import { registerNativePreviewHandlers } from '@affine/core/modules/code-block-preview-renderer';
 import { DocsService } from '@affine/core/modules/doc';
 import { FeatureFlagService } from '@affine/core/modules/feature-flag';
 import { GlobalContextService } from '@affine/core/modules/global-context';
@@ -45,6 +46,7 @@ import {
 } from '@affine/graphql';
 import { I18n } from '@affine/i18n';
 import { StoreManagerClient } from '@affine/nbstore/worker/client';
+import { setTelemetryTransport } from '@affine/track';
 import { Container } from '@blocksuite/affine/global/di';
 import {
   docLinkBaseURLMiddleware,
@@ -70,10 +72,12 @@ import { Auth } from './plugins/auth';
 import { Hashcash } from './plugins/hashcash';
 import { NbStoreNativeDBApis } from './plugins/nbstore';
 import { PayWall } from './plugins/paywall';
+import { Preview } from './plugins/preview';
 import { writeEndpointToken } from './proxy';
 import { enableNavigationGesture$ } from './web-navigation-control';
 
 const storeManagerClient = createStoreManagerClient();
+setTelemetryTransport(storeManagerClient.telemetry);
 window.addEventListener('beforeunload', () => {
   storeManagerClient.dispose();
 });
@@ -212,6 +216,11 @@ framework.impl(NativePaywallProvider, {
 });
 
 const frameworkProvider = framework.provider();
+
+registerNativePreviewHandlers({
+  renderMermaidSvg: request => Preview.renderMermaidSvg(request),
+  renderTypstSvg: request => Preview.renderTypstSvg(request),
+});
 
 // ------ some apis for native ------
 (window as any).getCurrentServerBaseUrl = () => {
