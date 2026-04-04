@@ -1,6 +1,11 @@
 export * from './blob-read';
 export * from './code-artifact';
 export * from './conversation-summary';
+export * from './database-add-rows';
+export * from './database-query';
+export * from './database-read';
+export * from './database-update-cells';
+export * from './database-utils';
 export * from './doc-compose';
 export * from './doc-edit';
 export * from './doc-keyword-search';
@@ -11,4 +16,5 @@ export * from './error';
 export * from './exa-crawl';
 export * from './exa-search';
 export * from './section-edit';
+export * from './task-query';
 export * from './tool';

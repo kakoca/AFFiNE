@@ -79,6 +79,15 @@ export const PromptToolsSchema = z
     'docCompose',
     // section editing
     'sectionEdit',
+    // database tools
+    'databaseRead',
+    'databaseQuery',
+    'databaseAddRows',
+    'databaseUpdateCells',
+    'databaseList',
+    // task management tools
+    'taskCreate',
+    'taskQuery',
   ])
   .array();
 

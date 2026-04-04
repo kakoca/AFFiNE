@@ -20,17 +20,29 @@ import { PromptService } from '../prompt/service';
 import {
   buildBlobContentGetter,
   buildContentGetter,
+  buildDatabaseAddRowsHandler,
+  buildDatabaseGetter,
+  buildDatabaseListGetter,
+  buildDatabaseQueryHandler,
+  buildDatabaseUpdateCellsHandler,
   buildDocContentGetter,
   buildDocCreateHandler,
   buildDocKeywordSearchGetter,
   buildDocSearchGetter,
   buildDocUpdateHandler,
   buildDocUpdateMetaHandler,
+  buildTaskCreateHandler,
+  buildTaskQueryHandler,
   type CopilotTool,
   type CopilotToolSet,
   createBlobReadTool,
   createCodeArtifactTool,
   createConversationSummaryTool,
+  createDatabaseAddRowsTool,
+  createDatabaseListTool,
+  createDatabaseQueryTool,
+  createDatabaseReadTool,
+  createDatabaseUpdateCellsTool,
   createDocComposeTool,
   createDocCreateTool,
   createDocEditTool,
@@ -42,6 +54,8 @@ import {
   createExaCrawlTool,
   createExaSearchTool,
   createSectionEditTool,
+  createTaskCreateTool,
+  createTaskQueryTool,
 } from '../tools';
 import { canonicalizePromptAttachment } from './attachments';
 import { CopilotProviderFactory } from './factory';
@@ -516,6 +530,75 @@ export abstract class CopilotProvider<C = any> {
           }
           case 'sectionEdit': {
             tools.section_edit = createSectionEditTool(prompt, this.factory);
+            break;
+          }
+          case 'databaseRead': {
+            const getDatabase = buildDatabaseGetter(ac, docReader, models);
+            const getDatabaseList = buildDatabaseListGetter(
+              ac,
+              docReader,
+              models
+            );
+            tools.database_read = createDatabaseReadTool(
+              getDatabase.bind(null, options)
+            );
+            tools.database_list = createDatabaseListTool(
+              getDatabaseList.bind(null, options)
+            );
+            break;
+          }
+          case 'databaseQuery': {
+            const queryDatabase = buildDatabaseQueryHandler(
+              ac,
+              docReader,
+              models
+            );
+            tools.database_query = createDatabaseQueryTool(
+              queryDatabase.bind(null, options)
+            );
+            break;
+          }
+          case 'databaseAddRows': {
+            const addRows = buildDatabaseAddRowsHandler(
+              ac,
+              docWriter,
+              docReader,
+              models
+            );
+            tools.database_add_rows = createDatabaseAddRowsTool(
+              addRows.bind(null, options)
+            );
+            break;
+          }
+          case 'databaseUpdateCells': {
+            const updateCells = buildDatabaseUpdateCellsHandler(
+              ac,
+              docWriter,
+              docReader,
+              models
+            );
+            tools.database_update_cells = createDatabaseUpdateCellsTool(
+              updateCells.bind(null, options)
+            );
+            break;
+          }
+          case 'taskCreate': {
+            const createTasks = buildTaskCreateHandler(
+              ac,
+              docWriter,
+              docReader,
+              models
+            );
+            tools.task_create = createTaskCreateTool(
+              createTasks.bind(null, options)
+            );
+            break;
+          }
+          case 'taskQuery': {
+            const queryTasks = buildTaskQueryHandler(ac, docReader, models);
+            tools.task_query = createTaskQueryTool(
+              queryTasks.bind(null, options)
+            );
             break;
           }
         }
