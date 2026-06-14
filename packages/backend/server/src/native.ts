@@ -59,6 +59,34 @@ export const updateDocTitle = serverNativeModule.updateDocTitle;
 export const updateDocProperties = serverNativeModule.updateDocProperties;
 export const updateRootDocMetaTitle = serverNativeModule.updateRootDocMetaTitle;
 
+// Database manipulation exports
+export const databaseAddRowsNative = serverNativeModule.databaseAddRowsNative;
+export const databaseUpdateCellsNative =
+  serverNativeModule.databaseUpdateCellsNative;
+export const databaseCreateNative = serverNativeModule.databaseCreateNative;
+
+// Folder management exports
+export const folderCreateNative = serverNativeModule.folderCreateNative;
+export const folderMoveNative = serverNativeModule.folderMoveNative;
+export const docMoveToFolderNative = serverNativeModule.docMoveToFolderNative;
+export const folderDeleteNative = serverNativeModule.folderDeleteNative;
+export const folderListNative = serverNativeModule.folderListNative;
+export const folderGetHierarchyNative =
+  serverNativeModule.folderGetHierarchyNative;
+export const buildFoldersDocId = serverNativeModule.buildFoldersDocIdNapi;
+export const isFoldersDocument = serverNativeModule.isFoldersDocumentNapi;
+export const folderDebugNative = serverNativeModule.folderDebugNative;
+
+// Collection management exports
+export const collectionListNative = serverNativeModule.collectionListNative;
+export const collectionCreateNative = serverNativeModule.collectionCreateNative;
+export const collectionUpdateNative = serverNativeModule.collectionUpdateNative;
+export const collectionDeleteNative = serverNativeModule.collectionDeleteNative;
+export const collectionAddDocsNative =
+  serverNativeModule.collectionAddDocsNative;
+export const collectionRemoveDocsNative =
+  serverNativeModule.collectionRemoveDocsNative;
+
 type NativeLlmModule = {
   llmDispatch?: (
     protocol: string,

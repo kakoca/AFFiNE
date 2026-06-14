@@ -85,9 +85,24 @@ export const PromptToolsSchema = z
     'databaseAddRows',
     'databaseUpdateCells',
     'databaseList',
+    'databaseCreate',
     // task management tools
     'taskCreate',
     'taskQuery',
+    // folder management tools
+    'folderCreate',
+    'folderMove',
+    'folderDelete',
+    'folderList',
+    'folderGetHierarchy',
+    'docMoveToFolder',
+    // collection management tools
+    'collectionList',
+    'collectionCreate',
+    'collectionUpdate',
+    'collectionDelete',
+    'collectionAddDocs',
+    'collectionRemoveDocs',
   ])
   .array();
 

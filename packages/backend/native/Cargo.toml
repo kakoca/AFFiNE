@@ -15,6 +15,7 @@ affine_common = { workspace = true, features = [
   "napi",
   "ydoc-loader",
 ] }
+ahash = { workspace = true }
 anyhow = { workspace = true }
 chrono = { workspace = true }
 file-format = { workspace = true }

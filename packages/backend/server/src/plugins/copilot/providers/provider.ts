@@ -19,8 +19,15 @@ import { CopilotContextService } from '../context/service';
 import { PromptService } from '../prompt/service';
 import {
   buildBlobContentGetter,
+  buildCollectionAddDocsHandler,
+  buildCollectionCreateHandler,
+  buildCollectionDeleteHandler,
+  buildCollectionListHandler,
+  buildCollectionRemoveDocsHandler,
+  buildCollectionUpdateHandler,
   buildContentGetter,
   buildDatabaseAddRowsHandler,
+  buildDatabaseCreateHandler,
   buildDatabaseGetter,
   buildDatabaseListGetter,
   buildDatabaseQueryHandler,
@@ -28,17 +35,30 @@ import {
   buildDocContentGetter,
   buildDocCreateHandler,
   buildDocKeywordSearchGetter,
+  buildDocMoveToFolderHandler,
   buildDocSearchGetter,
   buildDocUpdateHandler,
   buildDocUpdateMetaHandler,
+  buildFolderCreateHandler,
+  buildFolderDeleteHandler,
+  buildFolderGetHierarchyHandler,
+  buildFolderListHandler,
+  buildFolderMoveHandler,
   buildTaskCreateHandler,
   buildTaskQueryHandler,
   type CopilotTool,
   type CopilotToolSet,
   createBlobReadTool,
   createCodeArtifactTool,
+  createCollectionAddDocsTool,
+  createCollectionCreateTool,
+  createCollectionDeleteTool,
+  createCollectionListTool,
+  createCollectionRemoveDocsTool,
+  createCollectionUpdateTool,
   createConversationSummaryTool,
   createDatabaseAddRowsTool,
+  createDatabaseCreateTool,
   createDatabaseListTool,
   createDatabaseQueryTool,
   createDatabaseReadTool,
@@ -47,12 +67,18 @@ import {
   createDocCreateTool,
   createDocEditTool,
   createDocKeywordSearchTool,
+  createDocMoveToFolderTool,
   createDocReadTool,
   createDocSemanticSearchTool,
   createDocUpdateMetaTool,
   createDocUpdateTool,
   createExaCrawlTool,
   createExaSearchTool,
+  createFolderCreateTool,
+  createFolderDeleteTool,
+  createFolderGetHierarchyTool,
+  createFolderListTool,
+  createFolderMoveTool,
   createSectionEditTool,
   createTaskCreateTool,
   createTaskQueryTool,
@@ -582,6 +608,18 @@ export abstract class CopilotProvider<C = any> {
             );
             break;
           }
+          case 'databaseCreate': {
+            const createDatabase = buildDatabaseCreateHandler(
+              ac,
+              docWriter,
+              docReader,
+              models
+            );
+            tools.database_create = createDatabaseCreateTool(
+              createDatabase.bind(null, options)
+            );
+            break;
+          }
           case 'taskCreate': {
             const createTasks = buildTaskCreateHandler(
               ac,
@@ -598,6 +636,122 @@ export abstract class CopilotProvider<C = any> {
             const queryTasks = buildTaskQueryHandler(ac, docReader, models);
             tools.task_query = createTaskQueryTool(
               queryTasks.bind(null, options)
+            );
+            break;
+          }
+          case 'folderCreate': {
+            const createFolder = buildFolderCreateHandler(
+              ac,
+              docWriter,
+              docReader
+            );
+            tools.folder_create = createFolderCreateTool(
+              createFolder.bind(null, options)
+            );
+            break;
+          }
+          case 'folderMove': {
+            const moveFolder = buildFolderMoveHandler(ac, docWriter, docReader);
+            tools.folder_move = createFolderMoveTool(
+              moveFolder.bind(null, options)
+            );
+            break;
+          }
+          case 'folderDelete': {
+            const deleteFolder = buildFolderDeleteHandler(
+              ac,
+              docWriter,
+              docReader
+            );
+            tools.folder_delete = createFolderDeleteTool(
+              deleteFolder.bind(null, options)
+            );
+            break;
+          }
+          case 'folderList': {
+            const listFolders = buildFolderListHandler(ac, docReader);
+            tools.folder_list = createFolderListTool(
+              listFolders.bind(null, options)
+            );
+            break;
+          }
+          case 'folderGetHierarchy': {
+            const getHierarchy = buildFolderGetHierarchyHandler(ac, docReader);
+            tools.folder_get_hierarchy = createFolderGetHierarchyTool(
+              getHierarchy.bind(null, options)
+            );
+            break;
+          }
+          case 'docMoveToFolder': {
+            const moveDoc = buildDocMoveToFolderHandler(
+              ac,
+              docWriter,
+              docReader
+            );
+            tools.doc_move_to_folder = createDocMoveToFolderTool(
+              moveDoc.bind(null, options)
+            );
+            break;
+          }
+          case 'collectionList': {
+            const listCollections = buildCollectionListHandler(ac, docReader);
+            tools.collection_list = createCollectionListTool(
+              listCollections.bind(null, options)
+            );
+            break;
+          }
+          case 'collectionCreate': {
+            const createCollection = buildCollectionCreateHandler(
+              ac,
+              docWriter,
+              docReader
+            );
+            tools.collection_create = createCollectionCreateTool(
+              createCollection.bind(null, options)
+            );
+            break;
+          }
+          case 'collectionUpdate': {
+            const updateCollection = buildCollectionUpdateHandler(
+              ac,
+              docWriter,
+              docReader
+            );
+            tools.collection_update = createCollectionUpdateTool(
+              updateCollection.bind(null, options)
+            );
+            break;
+          }
+          case 'collectionDelete': {
+            const deleteCollection = buildCollectionDeleteHandler(
+              ac,
+              docWriter,
+              docReader
+            );
+            tools.collection_delete = createCollectionDeleteTool(
+              deleteCollection.bind(null, options)
+            );
+            break;
+          }
+          case 'collectionAddDocs': {
+            const addDocs = buildCollectionAddDocsHandler(
+              ac,
+              docWriter,
+              docReader
+            );
+            tools.collection_add_docs = createCollectionAddDocsTool(
+              addDocs.bind(null, options)
+            );
+            break;
+          }
+          case 'collectionRemoveDocs': {
+            const removeDocs = buildCollectionRemoveDocsHandler(
+              ac,
+              docWriter,
+              docReader
+            );
+            tools.collection_remove_docs = createCollectionRemoveDocsTool(
+              removeDocs.bind(null, options)
             );
             break;
           }

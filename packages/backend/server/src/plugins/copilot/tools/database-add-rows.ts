@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { DocReader, DocWriter } from '../../../core/doc';
 import { AccessController } from '../../../core/permission';
 import { Models } from '../../../models';
+import { databaseAddRowsNative } from '../../../native';
 import {
   normalizeCellValue,
   parseDatabaseFromDoc,
@@ -15,12 +16,9 @@ import type { CopilotChatOptions } from './types';
 
 const logger = new Logger('DatabaseAddRowsTool');
 
-// Import from native module - we need to add a function to manipulate database via Yjs updates
-// For now, we operate via markdown/doc updates
-
 export const buildDatabaseAddRowsHandler = (
   ac: AccessController,
-  _docWriter: DocWriter,
+  docWriter: DocWriter,
   docReader: DocReader,
   _models: Models
 ) => {
@@ -124,32 +122,33 @@ export const buildDatabaseAddRowsHandler = (
     }
 
     try {
-      // For now, we create a summary of what would be added
-      // In a full implementation, we would update the Yjs document directly
-      // This requires Rust native functions to manipulate the database structure
-
-      // Build markdown row content for each row
-      const rowContents: string[] = [];
+      // Prepare rows data for native function
+      // Convert normalized rows to the format expected by the native function
+      const rowsForNative: Record<string, unknown>[] = [];
       for (const row of normalizedRows) {
-        const cellDescriptions: string[] = [];
-        for (const column of database.columns) {
-          const value = row[column.id];
-          if (value !== undefined) {
-            cellDescriptions.push(`${column.name}: ${JSON.stringify(value)}`);
-          }
+        const rowData: Record<string, unknown> = {};
+        for (const [colId, value] of Object.entries(row)) {
+          rowData[colId] = value;
         }
-        rowContents.push(cellDescriptions.join(' | '));
+        rowsForNative.push(rowData);
       }
 
-      // Build row descriptions for AI context
-      const _rowDescriptions = rowContents
-        .map((content, i) => `- Row ${i + 1}: ${content}`)
-        .join('\n');
+      // Call native Rust function to add rows
+      const rowsJson = JSON.stringify(rowsForNative);
+      const updatedBinary = databaseAddRowsNative(
+        Buffer.from(doc.bin),
+        database.blockId,
+        rowsJson
+      );
 
-      // Reference the variable to avoid unused warning
-      void _rowDescriptions;
+      // Apply the update to the document
+      await docWriter.pushRawUpdate(
+        options.workspace,
+        docId,
+        updatedBinary,
+        options.user
+      );
 
-      // Return success with information about what was requested
       return {
         success: true,
         database_id: database.blockId,
@@ -166,7 +165,6 @@ export const buildDatabaseAddRowsHandler = (
             })
           ),
         })),
-        note: 'The AI can add rows through doc_edit tool. Direct database manipulation requires native Rust support for Yjs database updates.',
       };
     } catch (err: any) {
       logger.error(`Failed to add rows to database`, err);
@@ -200,7 +198,7 @@ Cell values should match the column type:
 - progress: number (0-100)
 
 The tool validates cell values before adding and returns errors for invalid data.
-Currently requires the AI to use doc_edit tool for the actual update.
+Updates are applied directly to the document using native Yjs manipulation.
 
 Example:
 {
@@ -238,292 +236,6 @@ Example:
       } catch (err: any) {
         logger.error(`Failed to add rows`, err);
         return toolError('Add Rows Failed', err.message ?? String(err));
-      }
-    },
-  });
-};
-
-/**
- * Tool to create a task database row with structured task data
- */
-export const buildTaskCreateHandler = (
-  ac: AccessController,
-  _docWriter: DocWriter,
-  docReader: DocReader,
-  _models: Models
-) => {
-  return async (
-    options: CopilotChatOptions,
-    docId: string,
-    databaseBlockId: string | undefined,
-    tasks: Array<{
-      title: string;
-      description?: string;
-      status?: string;
-      priority?: string;
-      due_date?: string;
-      assignee?: string;
-      tags?: string[];
-      custom_properties?: Record<string, unknown>;
-    }>
-  ) => {
-    if (!options?.user || !options?.workspace) {
-      return toolError(
-        'Task Create Failed',
-        'Missing user or workspace context'
-      );
-    }
-
-    // Check update permission
-    const canAccess = await ac
-      .user(options.user)
-      .workspace(options.workspace)
-      .doc(docId)
-      .can('Doc.Update');
-
-    if (!canAccess) {
-      return toolError(
-        'Task Create Failed',
-        `You do not have permission to update document ${docId}.`
-      );
-    }
-
-    // Get current doc
-    const doc = await docReader.getDoc(options.workspace, docId);
-    if (!doc?.bin) {
-      return toolError('Task Create Failed', `Document ${docId} not found`);
-    }
-
-    const database = await parseDatabaseFromDoc(doc.bin, databaseBlockId);
-
-    if (!database) {
-      return toolError(
-        'Database Not Found',
-        databaseBlockId
-          ? `Database block ${databaseBlockId} not found in document ${docId}.`
-          : `No database found in document ${docId}.`
-      );
-    }
-
-    // Build property lookup
-    const propertyByName = new Map(
-      database.columns.map(col => [col.name.toLowerCase(), col])
-    );
-
-    // Find common task-related columns
-    const titleCol =
-      propertyByName.get('title') ??
-      database.columns.find(
-        c => c.type === 'title' || c.name.toLowerCase() === 'name'
-      );
-    const statusCol = propertyByName.get('status');
-    const priorityCol = propertyByName.get('priority');
-    const dueDateCol =
-      propertyByName.get('due date') ?? propertyByName.get('duedate');
-    const assigneeCol =
-      propertyByName.get('assignee') ?? propertyByName.get('assigned to');
-    const tagsCol = propertyByName.get('tags');
-
-    const createdTasks: Array<{
-      index: number;
-      title: string;
-      cells: Record<string, unknown>;
-    }> = [];
-    const validationErrors: string[] = [];
-
-    for (let i = 0; i < tasks.length; i++) {
-      const task = tasks[i];
-      const taskCells: Record<string, unknown> = {};
-
-      // Map task properties to columns
-      if (titleCol) {
-        taskCells[titleCol.id] = task.title;
-      }
-
-      if (task.status && statusCol) {
-        taskCells[statusCol.id] = normalizeCellValue(
-          task.status,
-          statusCol.type,
-          statusCol.data
-        );
-      }
-
-      if (task.priority && priorityCol) {
-        taskCells[priorityCol.id] = normalizeCellValue(
-          task.priority,
-          priorityCol.type,
-          priorityCol.data
-        );
-      }
-
-      if (task.due_date && dueDateCol) {
-        taskCells[dueDateCol.id] = normalizeCellValue(
-          task.due_date,
-          dueDateCol.type,
-          dueDateCol.data
-        );
-      }
-
-      if (task.assignee && assigneeCol) {
-        taskCells[assigneeCol.id] = task.assignee;
-      }
-
-      if (task.tags && tagsCol) {
-        taskCells[tagsCol.id] = normalizeCellValue(
-          task.tags,
-          tagsCol.type,
-          tagsCol.data
-        );
-      }
-
-      // Add custom properties
-      if (task.custom_properties) {
-        for (const [propName, value] of Object.entries(
-          task.custom_properties
-        )) {
-          const col = propertyByName.get(propName.toLowerCase());
-          if (col) {
-            const validation = validateCellValue(value, col.type, col.data);
-            if (validation.valid) {
-              taskCells[col.id] = normalizeCellValue(value, col.type, col.data);
-            } else {
-              validationErrors.push(
-                `Task ${i + 1} (${task.title}): ${propName}: ${validation.error}`
-              );
-            }
-          }
-        }
-      }
-
-      // Validate required columns
-      if (!taskCells[titleCol?.id ?? '']) {
-        validationErrors.push(`Task ${i + 1}: Title column is required`);
-        continue;
-      }
-
-      createdTasks.push({
-        index: i + 1,
-        title: task.title,
-        cells: taskCells,
-      });
-    }
-
-    if (validationErrors.length > 0) {
-      return toolError(
-        'Validation Failed',
-        `Task validation errors:\n${validationErrors.join('\n')}`
-      );
-    }
-
-    return {
-      success: true,
-      database_id: database.blockId,
-      database_title: database.title,
-      doc_id: docId,
-      tasks_requested: tasks.length,
-      tasks_mapped: createdTasks.length,
-      tasks: createdTasks.map(task => ({
-        ...task,
-        cells_formatted: Object.fromEntries(
-          Object.entries(task.cells).map(([colId, value]) => {
-            const col = database.columns.find(c => c.id === colId);
-            return col ? [col.name, value] : [colId, value];
-          })
-        ),
-      })),
-      detected_columns: {
-        title: titleCol?.name,
-        status: statusCol?.name,
-        priority: priorityCol?.name,
-        due_date: dueDateCol?.name,
-        assignee: assigneeCol?.name,
-        tags: tagsCol?.name,
-      },
-      note: 'Task mapping complete. The AI uses doc_edit tool to add these tasks to the database.',
-    };
-  };
-};
-
-export const createTaskCreateTool = (
-  createTasks: (
-    docId: string,
-    databaseBlockId: string | undefined,
-    tasks: Array<{
-      title: string;
-      description?: string;
-      status?: string;
-      priority?: string;
-      due_date?: string;
-      assignee?: string;
-      tags?: string[];
-      custom_properties?: Record<string, unknown>;
-    }>
-  ) => Promise<object>
-) => {
-  return defineTool({
-    description: `
-Create structured tasks in a database. This tool is optimized for task management and automatically maps common task properties to database columns.
-
-Auto-detected columns:
-- Title/Name: The task title (required)
-- Status: Task status (e.g., "Not Started", "In Progress", "Done")
-- Priority: Priority level (e.g., "Low", "Medium", "High", "Urgent")
-- Due Date: Due date (ISO format)
-- Assignee: Person assigned to the task
-- Tags: Labels/categories
-
-The tool validates that the required columns exist and that values match the column types.
-If the database doesn't have these columns, the tool will report which ones are missing.
-
-Example:
-{
-  "doc_id": "tasks-doc",
-  "tasks": [
-    {
-      "title": "Review PR",
-      "status": "Not Started",
-      "priority": "High",
-      "due_date": "2024-12-31",
-      "assignee": "John",
-      "tags": ["backend", "urgent"]
-    }
-  ]
-}
-`,
-    inputSchema: z.object({
-      doc_id: z
-        .string()
-        .describe('The document ID containing the task database'),
-      database_block_id: z
-        .string()
-        .optional()
-        .describe('The database block ID (if multiple databases exist)'),
-      tasks: z
-        .array(
-          z.object({
-            title: z.string().min(1).describe('Task title (required)'),
-            description: z.string().optional().describe('Task description'),
-            status: z.string().optional().describe('Task status'),
-            priority: z.string().optional().describe('Priority level'),
-            due_date: z.string().optional().describe('Due date (ISO format)'),
-            assignee: z.string().optional().describe('Assigned person'),
-            tags: z.array(z.string()).optional().describe('Tags/labels'),
-            custom_properties: z
-              .record(z.any())
-              .optional()
-              .describe('Additional custom column values'),
-          })
-        )
-        .min(1)
-        .max(50)
-        .describe('Tasks to create'),
-    }),
-    execute: async ({ doc_id, database_block_id, tasks }) => {
-      try {
-        return await createTasks(doc_id, database_block_id, tasks);
-      } catch (err: any) {
-        logger.error(`Failed to create tasks`, err);
-        return toolError('Task Create Failed', err.message ?? String(err));
       }
     },
   });

@@ -290,6 +290,40 @@ export class DocWriter {
     return { success: true };
   }
 
+  /**
+   * Pushes a raw Yjs binary update to a document.
+   * Used for folder/collection operations that produce Yjs updates directly.
+   *
+   * @param workspaceId - The workspace ID
+   * @param docId - The document ID to update
+   * @param update - The raw Yjs update binary
+   * @param editorId - Optional editor ID for tracking
+   */
+  async pushRawUpdate(
+    workspaceId: string,
+    docId: string,
+    update: Uint8Array,
+    editorId?: string
+  ): Promise<void> {
+    this.logger.debug(
+      `Pushing raw update to doc ${docId} in workspace ${workspaceId}`
+    );
+
+    const timestamp = await this.storage.pushDocUpdates(
+      workspaceId,
+      docId,
+      [update],
+      editorId
+    );
+    this.emitDocUpdatesPushed({
+      spaceId: workspaceId,
+      docId,
+      updates: [update],
+      timestamp,
+      editor: editorId,
+    });
+  }
+
   private emitDocUpdatesPushed(payload: {
     spaceId: string;
     docId: string;

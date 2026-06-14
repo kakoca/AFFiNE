@@ -190,6 +190,7 @@ name = "affine_server_native"
 version = "1.0.0"
 dependencies = [
  "affine_common",
+ "ahash",
  "anyhow",
  "chrono",
  "file-format",

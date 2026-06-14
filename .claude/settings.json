@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -ri \"noavailablecontext\\\\|no_available_context\\\\|no user context\" /c/dev/AFFiNE/packages/backend/ --include=*.ts -l)",
+      "Bash(xargs grep:*)"
+    ]
+  }
+}

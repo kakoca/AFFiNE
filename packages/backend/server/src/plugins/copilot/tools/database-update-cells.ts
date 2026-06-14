@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { DocReader, type DocWriter } from '../../../core/doc';
 import { AccessController } from '../../../core/permission';
 import { Models } from '../../../models';
+import { databaseUpdateCellsNative } from '../../../native';
 import {
   normalizeCellValue,
   parseDatabaseFromDoc,
@@ -24,7 +25,7 @@ const isToolError = (result: ToolError | object): result is ToolError =>
 
 export const buildDatabaseUpdateCellsHandler = (
   ac: AccessController,
-  _docWriter: DocWriter,
+  docWriter: DocWriter,
   docReader: DocReader,
   models: Models
 ) => {
@@ -156,7 +157,7 @@ export const buildDatabaseUpdateCellsHandler = (
       return toolError('Update Cells Failed', 'No valid cell updates');
     }
 
-    // Format response with what would be updated
+    // Format response with what will be updated
     const formattedUpdates = validUpdates.map(update => {
       const row = rowById.get(update.row_id);
       return {
@@ -171,16 +172,45 @@ export const buildDatabaseUpdateCellsHandler = (
       };
     });
 
-    return {
-      success: true,
-      database_id: database.blockId,
-      database_title: database.title,
-      doc_id: docId,
-      updates_requested: updates.length,
-      updates_valid: validUpdates.length,
-      updates: formattedUpdates,
-      note: 'Cell updates validated. The AI uses doc_edit tool to apply these changes to the database.',
-    };
+    try {
+      // Prepare updates for native function
+      // Format: [[row_id, column_id, value], ...]
+      const updatesForNative: [string, string, unknown][] = [];
+      for (const update of validUpdates) {
+        for (const [colId, value] of Object.entries(update.cells)) {
+          updatesForNative.push([update.row_id, colId, value]);
+        }
+      }
+
+      // Call native Rust function to update cells
+      const updatesJson = JSON.stringify(updatesForNative);
+      const updatedBinary = databaseUpdateCellsNative(
+        Buffer.from(doc.bin),
+        database.blockId,
+        updatesJson
+      );
+
+      // Apply the update to the document
+      await docWriter.pushRawUpdate(
+        options.workspace,
+        docId,
+        updatedBinary,
+        options.user
+      );
+
+      return {
+        success: true,
+        database_id: database.blockId,
+        database_title: database.title,
+        doc_id: docId,
+        updates_requested: updates.length,
+        updates_applied: validUpdates.length,
+        updates: formattedUpdates,
+      };
+    } catch (err: any) {
+      logger.error(`Failed to update cells in database`, err);
+      return toolError('Update Cells Failed', err.message ?? String(err));
+    }
   };
 };
 

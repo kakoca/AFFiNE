@@ -26,10 +26,106 @@ export const AFFINE_PRO_LICENSE_AES_KEY: string | undefined | null
 
 export const AFFINE_PRO_PUBLIC_KEY: string | undefined | null
 
+/**
+ * Builds the folders document ID for a workspace.
+ *
+ * # Arguments
+ * * `workspace_id` - The workspace ID
+ *
+ * # Returns
+ * The folders document ID (db$<workspaceId>$folders)
+ */
+export declare function buildFoldersDocIdNapi(workspaceId: string): string
+
 export interface Chunk {
   index: number
   content: string
 }
+
+/**
+ * Adds document IDs to a collection's allowList.
+ *
+ * # Arguments
+ * * `root_doc_binary` - The workspace root doc binary
+ * * `collection_id` - The collection ID
+ * * `doc_ids_json` - JSON array of document IDs to add
+ *
+ * # Returns
+ * Updated doc binary
+ */
+export declare function collectionAddDocsNative(rootDocBinary: Buffer, collectionId: string, docIdsJson: string): Buffer
+
+/**
+ * Creates a new collection in the workspace root doc.
+ *
+ * # Arguments
+ * * `root_doc_binary` - The workspace root doc binary
+ * * `collection_id` - Optional specific ID (generates if not provided)
+ * * `name` - Collection name
+ * * `filters_json` - JSON array of filter params
+ * * `allow_list_json` - JSON array of document IDs
+ *
+ * # Returns
+ * Updated doc binary and collection ID
+ */
+export declare function collectionCreateNative(rootDocBinary: Buffer, collectionId: string | undefined | null, name: string, filtersJson: string, allowListJson: string): CollectionCreateResult
+
+/** Result of collection creation */
+export interface CollectionCreateResult {
+  docBinary: Buffer
+  collectionId: string
+}
+
+/**
+ * Deletes a collection by ID.
+ *
+ * # Arguments
+ * * `root_doc_binary` - The workspace root doc binary
+ * * `collection_id` - The collection ID to delete
+ *
+ * # Returns
+ * Updated doc binary
+ */
+export declare function collectionDeleteNative(rootDocBinary: Buffer, collectionId: string): Buffer
+
+/**
+ * Lists all collections from the workspace root doc.
+ *
+ * # Arguments
+ * * `root_doc_binary` - The workspace root doc binary
+ *
+ * # Returns
+ * JSON array of collection objects
+ */
+export declare function collectionListNative(rootDocBinary: Buffer): string
+
+/**
+ * Removes document IDs from a collection's allowList.
+ *
+ * # Arguments
+ * * `root_doc_binary` - The workspace root doc binary
+ * * `collection_id` - The collection ID
+ * * `doc_ids_json` - JSON array of document IDs to remove
+ *
+ * # Returns
+ * Updated doc binary
+ */
+export declare function collectionRemoveDocsNative(rootDocBinary: Buffer, collectionId: string, docIdsJson: string): Buffer
+
+/**
+ * Updates an existing collection.
+ *
+ * # Arguments
+ * * `root_doc_binary` - The workspace root doc binary
+ * * `collection_id` - The collection ID to update
+ * * `name` - Optional new name
+ * * `filters_json` - Optional JSON array of filter params
+ * * `allow_list_json` - Optional JSON array of document IDs
+ *
+ * # Returns
+ * Updated doc binary
+ */
+export declare function collectionUpdateNative(rootDocBinary: Buffer, collectionId: string, name?: string | undefined | null, filtersJson?: string | undefined | null, allowListJson?: string | undefined | null): Buffer
 
 /**
  * Converts markdown content to AFFiNE-compatible y-octo document binary.
@@ -44,11 +140,168 @@ export interface Chunk {
  */
 export declare function createDocWithMarkdown(title: string, markdown: string, docId: string): Buffer
 
+/**
+ * Adds rows to an existing database in a document.
+ *
+ * # Arguments
+ * * `existing_binary` - The current document binary
+ * * `database_block_id` - The ID of the database block
+ * * `rows_json` - JSON array of row data. Each row is an object with column_id -> value mapping.
+ *   Example: `[{"title": "Task 1", "status": "todo"}, {"title": "Task 2", "status": "done"}]`
+ *
+ * # Returns
+ * A Buffer containing the updated document binary
+ */
+export declare function databaseAddRowsNative(existingBinary: Buffer, databaseBlockId: string, rowsJson: string): Buffer
+
+/**
+ * Creates a new database block in a document.
+ *
+ * # Arguments
+ * * `existing_binary` - Optional current document binary (None for new doc)
+ * * `doc_id` - The document ID
+ * * `title` - Database title
+ * * `columns_json` - JSON array of column definitions.
+ *   Example: `[{"id": "col1", "name": "Title", "type": "title"}, {"id": "col2", "name": "Status", "type": "select", "options": [{"id": "opt1", "value": "Todo"}]}]`
+ * * `views_json` - JSON array of view definitions.
+ *   Example: `[{"id": "view1", "name": "Table", "view_type": "table"}]`
+ *
+ * # Returns
+ * A tuple containing (updated document binary, new database block ID)
+ */
+export declare function databaseCreateNative(existingBinary: Buffer | undefined | null, docId: string, title: string, columnsJson: string, viewsJson: string): DatabaseCreateResult
+
+/** Result of database creation */
+export interface DatabaseCreateResult {
+  docBinary: Buffer
+  databaseBlockId: string
+}
+
+/**
+ * Updates cell values in existing database rows.
+ *
+ * # Arguments
+ * * `existing_binary` - The current document binary
+ * * `database_block_id` - The ID of the database block
+ * * `updates_json` - JSON array of updates. Each update is [row_id, column_id, value].
+ *   Example: `[["row1", "status", "completed"], ["row1", "priority", "high"]]`
+ *
+ * # Returns
+ * A Buffer containing the updated document binary
+ */
+export declare function databaseUpdateCellsNative(existingBinary: Buffer, databaseBlockId: string, updatesJson: string): Buffer
+
+/**
+ * Moves a document to a folder.
+ *
+ * # Arguments
+ * * `existing_binary` - The current folders document binary
+ * * `workspace_id` - The workspace ID
+ * * `doc_id` - The document ID to move
+ * * `folder_id` - The target folder ID (null for root)
+ *
+ * # Returns
+ * A Buffer containing the updated document binary
+ */
+export declare function docMoveToFolderNative(existingBinary: Buffer, workspaceId: string, docId: string, folderId?: string | undefined | null): Buffer
+
+/**
+ * Creates a new folder in the folders document.
+ *
+ * # Arguments
+ * * `existing_binary` - The current folders document binary
+ * * `workspace_id` - The workspace ID (to validate doc_id)
+ * * `folder_id` - Optional specific ID to use (generates if not provided)
+ * * `name` - The folder name
+ * * `parent_id` - Optional parent folder ID (null for root)
+ *
+ * # Returns
+ * A struct containing the updated document binary and new folder ID
+ */
+export declare function folderCreateNative(existingBinary: Buffer, workspaceId: string, folderId: string | undefined | null, name: string, parentId?: string | undefined | null): FolderCreateResult
+
+/** Result of folder creation */
+export interface FolderCreateResult {
+  docBinary: Buffer
+  folderId: string
+}
+
+/**
+ * Deletes a folder (only if empty).
+ *
+ * # Arguments
+ * * `existing_binary` - The current folders document binary
+ * * `workspace_id` - The workspace ID
+ * * `folder_id` - The folder ID to delete
+ *
+ * # Returns
+ * A Buffer containing the updated document binary
+ */
+export declare function folderDeleteNative(existingBinary: Buffer, workspaceId: string, folderId: string): Buffer
+
+/** Debug: dump raw folder doc structure */
+export declare function folderDebugNative(existingBinary: Buffer): string
+
+/**
+ * Gets the complete folder hierarchy.
+ *
+ * # Arguments
+ * * `existing_binary` - The current folders document binary
+ * * `workspace_id` - The workspace ID
+ *
+ * # Returns
+ * JSON array of folder nodes with children
+ */
+export declare function folderGetHierarchyNative(existingBinary: Buffer, workspaceId: string): string
+
+/**
+ * Lists folders and contents in a folder.
+ *
+ * # Arguments
+ * * `existing_binary` - The current folders document binary
+ * * `workspace_id` - The workspace ID
+ * * `parent_id` - Optional parent folder ID (null for root)
+ *
+ * # Returns
+ * JSON array of folder records
+ */
+export declare function folderListNative(existingBinary: Buffer, workspaceId: string, parentId?: string | undefined | null): string
+
+/**
+ * Moves a folder to a different parent.
+ *
+ * # Arguments
+ * * `existing_binary` - The current folders document binary
+ * * `workspace_id` - The workspace ID (to validate)
+ * * `record_id` - The ID of the folder to move
+ * * `new_parent_id` - The new parent folder ID (null for root)
+ *
+ * # Returns
+ * A Buffer containing the updated document binary
+ */
+export declare function folderMoveNative(existingBinary: Buffer, workspaceId: string, recordId: string, newParentId?: string | undefined | null): Buffer
+
+/** Result of folder operation (move/delete) */
+export interface FolderOperationResult {
+  docBinary: Buffer
+}
+
 export declare function fromModelName(modelName: string): Tokenizer | null
 
 export declare function getMime(input: Uint8Array): string
 
 export declare function htmlSanitize(input: string): string
+
+/**
+ * Validates that the document ID is a folders document.
+ *
+ * # Arguments
+ * * `doc_id` - The document ID to validate
+ *
+ * # Returns
+ * True if this is a valid folders document ID
+ */
+export declare function isFoldersDocumentNapi(docId: string): boolean
 
 export declare function llmDispatch(protocol: string, backendConfigJson: string, requestJson: string): Promise<string>
 

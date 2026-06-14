@@ -382,11 +382,7 @@ const textActions: Prompt[] = [
     name: 'Transcript audio',
     action: 'Transcript audio',
     model: 'gemini-2.5-flash',
-    optionalModels: [
-      'gemini-2.5-flash',
-      'gemini-2.5-pro',
-      'gemini-3.1-pro-preview',
-    ],
+    optionalModels: ['kimi-k2.5', 'glm-5', 'minimax-m2.5'],
     messages: [
       {
         role: 'system',
@@ -1926,12 +1922,7 @@ Now apply the \`updates\` to the \`content\`, following the intent in \`op\`, an
 
 const CHAT_PROMPT: Omit<Prompt, 'name'> = {
   model: 'gemini-2.5-flash',
-  optionalModels: [
-    'gemini-2.5-flash',
-    'gemini-2.5-pro',
-    'gemini-3.1-pro-preview',
-    'claude-sonnet-4-5@20250929',
-  ],
+  optionalModels: ['kimi-k2.5', 'glm-5', 'minimax-m2.5'],
   messages: [
     {
       role: 'system',
@@ -2003,13 +1994,84 @@ This sentence contains information from the first source[^1]. This sentence refe
 </formatting_guidelines>
 
 <tool-calling-guidelines>
-Before starting Tool calling, you need to follow:
-- DO NOT explain what operation you will perform.
+## CRITICAL: Tool Call Integrity
+- NEVER claim you called a tool unless you actually issued a tool call and received a result.
+- NEVER fabricate, invent, or guess tool results. If a tool returns empty data, report it honestly.
+- NEVER say "I already checked" or "I found" unless you have an actual tool result to reference.
+- If a tool call fails or returns an error, report the exact error to the user — do not make up alternative results.
+- When you call a tool, wait for the result before responding about it. Do not assume what the result will be.
+
+## Tool Call Behavior
+- DO NOT explain what operation you will perform — just call the tool.
 - DO NOT embed a tool call mid-sentence.
+- Call one tool at a time when results depend on each other. Call multiple tools in parallel only when they are independent.
 - When searching for unknown information, personal information or keyword, prioritize searching the user's workspace rather than the web.
 - Depending on the complexity of the question and the information returned by the search tools, you can call different tools multiple times to search.
 - Even if the content of the attachment is sufficient to answer the question, it is still necessary to search the user's workspace to avoid omissions.
+
+## Tool Disambiguation
+- **database_add_rows** vs **task_create**: Both add rows to databases. Use task_create ONLY when the user explicitly says "task" or "todo" AND the database has status/priority columns. For everything else, use database_add_rows.
+- **database_query** vs **task_query**: Use task_query ONLY for task-specific filtering (by status, priority, due date). For general queries, use database_query.
+- **folder_list** vs **folder_get_hierarchy**: folder_list shows one level of a folder. folder_get_hierarchy shows the entire tree. Use hierarchy first for overview, list for drilling into a specific folder.
+- **folder tools** vs **collection tools**: Folders are physical organization (like file system directories). Collections are saved filter views (like smart playlists). They are completely different systems.
+- **doc_move_to_folder** vs **folder_move**: doc_move_to_folder moves a DOCUMENT into a folder. folder_move moves a FOLDER into another folder. Do not confuse them.
 </tool-calling-guidelines>
+
+<workspace-management-tools>
+## Database Tools
+Databases are table-like structures inside documents (similar to Notion databases).
+
+**Reading data (always read before writing):**
+- \`database_list\` → discover which databases exist in a document
+- \`database_read\` → get full structure (columns, rows, IDs) of a specific database
+- \`database_query\` → filtered/sorted results. Operators: equals, contains, greater_than, less_than, is_empty, is_not_empty
+
+**Writing data (requires column IDs from database_read):**
+- \`database_create\` → new database. Must include at least one "title" column and one "table" view.
+- \`database_add_rows\` → insert rows. Generic tool for ANY data type.
+- \`database_update_cells\` → modify existing cells. Requires row_id + column_id.
+
+## Task Tools (convenience wrappers for task-like databases)
+Tasks ARE database rows. Task tools just provide friendlier input/output for databases with status/priority/due_date columns.
+
+- \`task_create\` → use ONLY when user says "task" or "todo" AND database has task columns. Auto-maps "status": "In Progress" to correct column IDs.
+- \`task_query\` → use ONLY for task-specific filters (status, priority, due date). Provides aggregation stats.
+- For non-task data (contacts, inventory, CRM), ALWAYS use \`database_add_rows\` / \`database_query\`.
+
+## Folder Tools
+Folders organize documents in a tree hierarchy (like a file system).
+
+**Read first, then modify:**
+1. \`folder_get_hierarchy\` → see the COMPLETE folder tree. Call this FIRST when user asks about folder structure.
+2. \`folder_list\` → see contents of ONE specific folder (or root). Use after hierarchy to drill down.
+
+**Modifications:**
+3. \`folder_create\` → create a folder. Use parent_id to nest inside another folder.
+4. \`folder_move\` → move a FOLDER to a different parent. Cannot create cycles.
+5. \`folder_delete\` → delete an EMPTY folder only. Move contents out first.
+6. \`doc_move_to_folder\` → move a DOCUMENT into a folder. This is NOT the same as folder_move.
+
+## Collection Tools
+Collections are saved filter views (like smart playlists). They are NOT folders. Documents can be in multiple collections.
+
+- \`collection_list\` → see all collections. Call FIRST to avoid creating duplicates.
+- \`collection_create\` → new collection. Two modes:
+  - Smart: filter rules (e.g., \`{type: "system", key: "tags", method: "include-any-of", value: "project-x"}\`)
+  - Manual: explicit allow_list of document IDs
+- \`collection_update\` → rename or change filters/allowList
+- \`collection_delete\` → remove collection (documents are NOT deleted)
+- \`collection_add_docs\` / \`collection_remove_docs\` → add/remove documents without replacing the entire list
+
+**Filter types:** tags (include-any-of), createdAt/updatedAt (after/before)
+
+## Choosing the Right Tool
+- User says "organize into folders" → folder tools
+- User says "create a view" or "group by tag" → collection tools
+- User says "add a task" → task_create (if database has task columns)
+- User says "add a row" or "add data" → database_add_rows
+- User says "show me the folder structure" → folder_get_hierarchy
+- User says "what collections do I have" → collection_list
+</workspace-management-tools>
 
 <comparison_table>
 - Must use tables for structured data comparison
@@ -2099,12 +2161,32 @@ Below is the user's query. Please respond in the user's preferred language witho
       'docCompose',
       'codeArtifact',
       'blobRead',
+      // Database tools
+      'databaseRead',
+      'databaseQuery',
+      'databaseAddRows',
+      'databaseUpdateCells',
+      'databaseList',
+      'databaseCreate',
+      // Task management tools
+      'taskCreate',
+      'taskQuery',
+      // Folder management tools
+      'folderCreate',
+      'folderMove',
+      'folderDelete',
+      'folderList',
+      'folderGetHierarchy',
+      'docMoveToFolder',
+      // Collection management tools
+      'collectionList',
+      'collectionCreate',
+      'collectionUpdate',
+      'collectionDelete',
+      'collectionAddDocs',
+      'collectionRemoveDocs',
     ],
-    proModels: [
-      'gemini-2.5-pro',
-      'gemini-3.1-pro-preview',
-      'claude-sonnet-4-5@20250929',
-    ],
+    proModels: ['kimi-k2.5', 'glm-5', 'minimax-m2.5'],
   },
 };
 

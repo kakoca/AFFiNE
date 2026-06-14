@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(npx eslint:*)",
-      "Bash(yarn lint:eslint:fix -- packages/frontend/core/src/modules/ai-document-editor)"
+      "Bash(yarn lint:eslint:fix -- packages/frontend/core/src/modules/ai-document-editor)",
+      "Bash(npx napi:*)",
+      "Bash(cargo test:*)"
     ]
   }
 }
